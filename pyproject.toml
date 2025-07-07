@@ -1,0 +1,12 @@
+[project]
+name = "typedtoolz"
+version = "0.1.0"
+description = "Custom toolz-style functional utility library"
+requires-python = ">=3.11"
+dependencies = [
+    "toolz>=1.0.0",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
