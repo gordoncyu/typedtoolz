@@ -1,8 +1,6 @@
 from typing import Callable, ParamSpec, TypeVar, TypeVarTuple
 from typedtoolz import identity
 from typedtoolz.functoolz._curry import curry
-from toolz.functoolz import excepts as ex
-from typedtoolz.functoolz import wlth
 
 A = TypeVar('A')
 B = TypeVar('B')
@@ -22,5 +20,3 @@ def _excepts(
 excepts = curry(_excepts)
 
 union_error = excepts(identity)
-safe_read = union_error(type[MemoryError], lambda path: wlth(open(path), lambda f: f.read))
-thing = safe_read("asdfas")

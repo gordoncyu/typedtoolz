@@ -10,8 +10,11 @@ E = TypeVar('E')
 
 Ps = ParamSpec("Ps")
 from functools import wraps
-def _union_error(exc, func):
-    return _excepts(exc, identity, func)
+def _union_error(
+        exc: type[E] | tuple[type[E]],
+        func: Callable[Ps, B],
+        ) -> Callable[Ps, B | E]:
+    return _excepts(identity, exc, func)
 
 union_error = curry(_union_error)
 
@@ -30,7 +33,4 @@ def _excepts(
     return wrapper
 
 excepts = curry(_excepts)
-
-excepts_any = excepts(BaseException, identity)
-_ = excepts_any(lambda: 1)()
 
