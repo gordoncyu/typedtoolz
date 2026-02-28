@@ -1,7 +1,7 @@
 from typing import Callable, ParamSpec, TypeVar
 from typedtoolz import identity
 from typedtoolz.functoolz._curry import curry
-from toolz.functoolz import excepts as ex
+from toolz.functoolz import excepts as ex # pyright: ignore[reportMissingTypeStubs]
 
 A = TypeVar('A')
 B = TypeVar('B')

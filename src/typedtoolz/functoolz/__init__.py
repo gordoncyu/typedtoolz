@@ -7,6 +7,7 @@ from ._pipe import pipe
 from ._flow import flow
 from ._curry import curry
 from ._curryv import curryv
+from .exceptions import excepts
 
 __all__ = [
         "excepts",
