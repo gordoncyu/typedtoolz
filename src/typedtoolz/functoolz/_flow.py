@@ -1,8 +1,9 @@
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
 
-def flow(*fns: Callable[[Any], Any]) -> Callable[[Any], Any]:
-    def composed(x: Any) -> Any:
+T = TypeVar("T")
+def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], Any]:
+    def composed(x: T) -> Any:
         for f in fns:
             x = f(x)
         return x

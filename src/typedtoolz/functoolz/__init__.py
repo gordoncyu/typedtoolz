@@ -1,4 +1,4 @@
-from ._excepts import excepts, union_error
+from .exceptions import excepts, union_error
 from ._finalizer import finalizer
 from ._with import wlth
 from ._reduce import reduce, reduced
@@ -7,7 +7,6 @@ from ._pipe import pipe
 from ._flow import flow
 from ._curry import curry
 from ._curryv import curryv
-from .exceptions import excepts
 
 __all__ = [
         "excepts",
@@ -19,5 +18,7 @@ __all__ = [
         "return_parameter",
         "pipe",
         "flow",
+        "curry",
+        "curryv",
         ]
 

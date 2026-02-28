@@ -1,3 +1,3 @@
-from typedtoolz.functoolz import curryv
+from typedtoolz.functoolz import curry
 
-map = curryv(2, map)
+map = curry(map)
