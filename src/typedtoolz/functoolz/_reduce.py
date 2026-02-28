@@ -32,8 +32,8 @@ class _reduce_meta(type):
     @staticmethod
     def _reduce(
             function: Callable[[A | R, A], R],
-            sequence: Iterable[A], 
             initial: R,
+            sequence: Iterable[A], 
             ) -> R:
         it = iter(sequence)
 
@@ -58,7 +58,7 @@ class _reduce_meta(type):
             sequence: Iterable[A], 
             initial: R = cast(R, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
             ) -> R:
-        return cls._reduce(function, sequence, initial)
+        return cls._reduce(function, initial, sequence)
 
 class reduce(metaclass=_reduce_meta):
     """

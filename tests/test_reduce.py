@@ -52,13 +52,13 @@ def test_c_fully_applied():
 # ── reduce.ci (curry(reduce._reduce)) — curries function + sequence + initial ──
 
 def test_ci_fully_applied():
-    assert reduce.ci(lambda a, b: a + b, [1, 2, 3], 0) == 6
+    assert reduce.ci(lambda a, b: a + b, 0, [1, 2, 3]) == 6
 
 def test_ci_curried_step_by_step():
     step1 = reduce.ci(lambda a, b: a + b)
-    step2 = step1([1, 2, 3])
-    assert step2(0) == 6
+    step2 = step1(0)
+    assert step2([1, 2, 3]) == 6
 
 def test_ci_with_heterogeneous_initial():
-    result = reduce.ci(lambda acc, x: acc + [x], [1, 2, 3], [])
+    result = reduce.ci(lambda acc, x: acc + [x], cast(list[int], []), [1, 2, 3])
     assert result == [1, 2, 3]
