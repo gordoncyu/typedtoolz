@@ -1,5 +1,3 @@
-from typing import Callable, TypeVar, ParamSpec, Concatenate, overload, Literal
-
 from toolz.functoolz import curry
 
 def _bring(to_first, f):

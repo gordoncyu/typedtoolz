@@ -1,5 +1,3 @@
-from typing import Callable, ParamSpec, TypeVar
-
 from toolz.functoolz import curry
 
 

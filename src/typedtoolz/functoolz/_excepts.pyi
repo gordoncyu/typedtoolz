@@ -1,4 +1,4 @@
-from typing import Callable, Concatenate, ParamSpec, TypeVar, TypeVarTuple, Union
+from typing import Callable, ParamSpec, TypeVar, TypeVarTuple
 from typedtoolz import identity
 from typedtoolz.functoolz.bring import bring
 from typedtoolz.functoolz.curry import Curried3, curry

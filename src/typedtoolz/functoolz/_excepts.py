@@ -1,4 +1,4 @@
-from typing import Callable, ParamSpec, TypeVar, TypeVarTuple
+from typing import Callable, ParamSpec, TypeVar
 from typedtoolz import identity
 from typedtoolz.functoolz.curry import curry
 from toolz.functoolz import excepts as ex

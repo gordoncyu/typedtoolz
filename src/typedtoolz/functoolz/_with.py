@@ -1,5 +1,5 @@
 from io import TextIOBase, UnsupportedOperation
-from typing import Annotated, Callable, ContextManager, TypeVar, cast
+from typing import Callable, ContextManager, TypeVar, cast
 from typedtoolz import identityv
 from typedtoolz.functoolz.bring import bring
 from typedtoolz.functoolz.curry import Curried3, curry

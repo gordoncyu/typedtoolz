@@ -1,13 +1,15 @@
-from typing import List, Tuple, Any
+from collections.abc import Callable, Iterable
+from typing import TypeVar
 from typedtoolz.functoolz.curry import curry
 
-A = TypeVar('A')  # Generic type for the accumulator
+A = TypeVar('A')
+T = TypeVar('T')
 
 def _takewhile_acc(
-    func: Callable[[A, T], Tuple[bool, A]],
+    func: Callable[[A, T], tuple[bool, A]],
     initial_acc: A,
     iterable: Iterable[T],
-) -> List[T]:
+) -> list[T]:
     result = []
     acc = initial_acc
 
