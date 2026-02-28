@@ -71,7 +71,7 @@ class first:
         ``f(rp, *args) -> Any``  →  ``(*args) -> RP``
         """
         def inner(f: Callable[[RP, *PTs], Any]) -> Callable[[*PTs], RP]: # pyright: ignore[reportExplicitAny]
-            _local = threading.local()
+            _local = threading.local() # despite threading sounding like it's a high cost local is a low cost call
             @wraps(f)
             def innermost(*args):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
                 if hasattr(_local, '_rp_94fc446b_edce_4487_9dc0_fa9ab1974bf0'):

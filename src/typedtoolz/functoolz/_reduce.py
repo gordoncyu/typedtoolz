@@ -12,6 +12,7 @@ _initial_missing = object()
 # for some reason the builtin behavior differs from the src behavior because dumb
 # all so I can use pipe more ergonomically.
 class _reduce_meta(type):
+    # Following __call__ overloads structured to be compatible with functools.reduce
     @classmethod
     @overload
     def __call__(
