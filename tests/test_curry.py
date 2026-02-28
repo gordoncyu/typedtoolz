@@ -25,7 +25,7 @@ def test_curry_arity1():
     lambda: curry(id2)("foo", 3),
     lambda: curry(id2)("foo")(3),
 ])
-def test_curry_arity2(call):
+def test_curry_arity2(call):  # pyright: ignore[reportUnknownParameterType]
     assert call() == ("foo", 3)
 
 @pytest.mark.parametrize("call", [
@@ -33,7 +33,7 @@ def test_curry_arity2(call):
     lambda: curry(id3)("a")("b", "c"),
     lambda: curry(id3)("a", "b")("c"),
 ])
-def test_curry_arity3(call):
+def test_curry_arity3(call):  # pyright: ignore[reportUnknownParameterType]
     assert call() == ("a", "b", "c")
 
 @pytest.mark.parametrize("call", [
@@ -42,7 +42,7 @@ def test_curry_arity3(call):
     lambda: curry(id4)("w", "x")("y", "z"),
     lambda: curry(id4)("w", "x", "y")("z"),
 ])
-def test_curry_arity4(call):
+def test_curry_arity4(call):  # pyright: ignore[reportUnknownParameterType]
     assert call() == ("w", "x", "y", "z")
 
 def test_curry_kw_default():

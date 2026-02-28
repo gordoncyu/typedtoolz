@@ -26,7 +26,7 @@ def tv(i: int) -> str:
 
 
 # ── header ────────────────────────────────────────────────────────────
-print("from typing import Callable, Concatenate, ParamSpec, Protocol, TypeVar, overload\n")
+print("from typing import Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, overload\n")
 
 print("P = ParamSpec('P')")
 print("R = TypeVar('R', covariant=True)")
@@ -69,12 +69,21 @@ for arity in range(1, MAX + 1):
     emit_curried(arity, fixed_only=True)   # CurriedFixedN
 
 
-# ── curry(...) overloads (point to CurriedN) ──────────────────────────
+# ── curry(fn) overloads (point to CurriedN, inferred arity) ───────────
 for n in range(MAX, 0, -1):
     params = ", ".join(tv(i) for i in range(1, n + 1))
     gener  = ", ".join([*params.split(", "), "P", "R"])
     print("@overload")
     print(
         f"def curry(fn: Callable[Concatenate[{params}, P], R], /) -> Curried{n}[{gener}]: ...\n"
+    )
+
+# ── curry(pn, fn) overloads (point to CurriedFixedN, rest hidden) ─────
+for n in range(MAX, 0, -1):
+    params     = ", ".join(tv(i) for i in range(1, n + 1))
+    fixed_gens = ", ".join([*params.split(", "), "R"])
+    print("@overload")
+    print(
+        f"def curry(pn: Literal[{n}], fn: Callable[Concatenate[{params}, P], R], /) -> CurriedFixed{n}[{fixed_gens}]: ...\n"
     )
 
