@@ -1,10 +1,8 @@
 from typing import Callable, ParamSpec, TypeVar, TypeVarTuple
 from typedtoolz import identity
-from typedtoolz.functoolz.curry import Curried3, curry
+from typedtoolz.functoolz._curry import curry
 from toolz.functoolz import excepts as ex
 from typedtoolz.functoolz import wlth
-
-from typedtoolz.functoolz.pipe import pipe
 
 A = TypeVar('A')
 B = TypeVar('B')

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from typing import Callable, ParamSpec, TypeVar
-from typedtoolz.functoolz.curry import curry
+from typedtoolz.functoolz._curry import curry
 
 # ─── Generic type parameters ────────────────────────────────────────────
 A = TypeVar("A")             # argument routed to `body`
@@ -22,7 +22,7 @@ def _finalizer(
 ) -> R: ...
 finalizer = curry(_finalizer)
 
-from typedtoolz.functoolz.pipe import pipe
+# from typedtoolz.functoolz import pipe
 # _finalizer_body_last = pipe(_finalizer, bring(1), bring(3))
 # finalizer_body_last = curry(_finalizer_body_last)
 

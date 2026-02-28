@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable
 from typing import TypeVar
-from typedtoolz.functoolz.curry import curry
+from typedtoolz.functoolz import curry
 
 A = TypeVar('A')
 T = TypeVar('T')

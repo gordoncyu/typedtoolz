@@ -1,8 +1,8 @@
 from io import TextIOBase, UnsupportedOperation
 from typing import Callable, ContextManager, TypeVar, cast
 from typedtoolz import identityv
-from typedtoolz.functoolz.curry import curry
-from typedtoolz.functoolz.curryv import curryv
+from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 
 def _wlth[A, R](res: ContextManager[A], body: Callable[[A], R]) -> R:
     with res as val:

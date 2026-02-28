@@ -1,6 +1,6 @@
 from typing import Callable, ParamSpec, TypeVar
 from typedtoolz import identity
-from typedtoolz.functoolz.curry import curry
+from typedtoolz.functoolz._curry import curry
 from toolz.functoolz import excepts as ex
 
 A = TypeVar('A')

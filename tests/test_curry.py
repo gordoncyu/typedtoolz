@@ -1,7 +1,7 @@
 from io import StringIO
 from typing import TypeVar
 import pytest
-from typedtoolz.functoolz.curry import curry
+from typedtoolz.functoolz import curry
 from contextlib import redirect_stdout
 
 A1 = TypeVar("A1")
