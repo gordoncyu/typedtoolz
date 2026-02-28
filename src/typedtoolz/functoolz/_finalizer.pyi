@@ -23,11 +23,10 @@ def _finalizer(
 finalizer = curry(_finalizer)
 
 from typedtoolz.functoolz.pipe import pipe
-from typedtoolz.functoolz.bring import bring
-_finalizer_body_last = pipe(_finalizer, bring(1), bring(3))
-finalizer_body_last = curry(_finalizer_body_last)
+# _finalizer_body_last = pipe(_finalizer, bring(1), bring(3))
+# finalizer_body_last = curry(_finalizer_body_last)
 
-finalizer_args_first = pipe(_finalizer, bring(1), bring(3), bring(1), bring(2))
+# finalizer_args_first = pipe(_finalizer, bring(1), bring(3), bring(1), bring(2))
 
 # ─── Fully variadic “kw” version (ParamSpec-powered) ────────────────────
 

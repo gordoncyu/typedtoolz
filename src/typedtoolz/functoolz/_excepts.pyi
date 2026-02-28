@@ -1,6 +1,5 @@
 from typing import Callable, ParamSpec, TypeVar, TypeVarTuple
 from typedtoolz import identity
-from typedtoolz.functoolz.bring import bring
 from typedtoolz.functoolz.curry import Curried3, curry
 from toolz.functoolz import excepts as ex
 from typedtoolz.functoolz import wlth
