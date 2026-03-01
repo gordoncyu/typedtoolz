@@ -64,12 +64,12 @@ def mul(x: int, y: int) -> int:
 
 ```python
 @curryv(2)
-def greet(name: str, greeting: str, *, punct: str = "!") -> str:
+def greet(greeting: str, name: str, *, punct: str = "!") -> str:
     return f"{greeting}, {name}{punct}"
 ```
 
 ```python
->>> hello = greet(greeting="Hello")
+>>> hello = greet("Hello")
 >>> hello("World")
 'Hello, World!'
 >>> hello("World", punct=".")
@@ -110,14 +110,15 @@ Left fold over an iterable, compatible with `functools.reduce`.
 
 ```python
 from typedtoolz.functoolz import reduce
+from typing import Callable, cast
 ```
 
 ```python
 >>> reduce(lambda a, b: a + b, [1, 2, 3, 4, 5])
 15
->>> reduce(lambda a, b: a + [b], [1, 2, 3], [])
+>>> reduce(lambda a, b: a + [b], [1, 2, 3], cast(list[int], []))
 [1, 2, 3]
->>> sum_all = reduce.c(lambda a, b: a + b)
+>>> sum_all = reduce.c(cast(Callable[[int, int], int], lambda a, b: a + b))
 >>> sum_all([1, 2, 3])
 6
 ```
@@ -137,7 +138,7 @@ from typedtoolz.functoolz import excepts, union_error, tuple_error, remap_error
 **`excepts`** -- replace a caught exception with a handler's return value:
 
 ```python
-safe_div = excepts(lambda e: 0, ZeroDivisionError, lambda x: 10 // x)
+safe_div = excepts(lambda e: 0, ZeroDivisionError, cast(Callable[[int], int], lambda x: 10 // x))
 ```
 
 ```python
@@ -150,7 +151,7 @@ safe_div = excepts(lambda e: 0, ZeroDivisionError, lambda x: 10 // x)
 **`union_error`** -- return the exception as a value instead of raising:
 
 ```python
-safe_div = union_error(ZeroDivisionError, lambda x: 10 // x)
+safe_div = union_error(ZeroDivisionError, cast(Callable[[int], int], lambda x: 10 // x))
 ```
 
 ```python
@@ -163,7 +164,7 @@ ZeroDivisionError('integer division or modulo by zero')
 **`tuple_error`** -- return `(True, value)` on success or `(False, exc)` on failure, for use with `match`:
 
 ```python
-safe_div = tuple_error(ZeroDivisionError, lambda x: 10 // x)
+safe_div = tuple_error(ZeroDivisionError, cast(Callable[[int], int], lambda x: 10 // x))
 ```
 
 ```python
@@ -180,7 +181,9 @@ failed: integer division or modulo by zero
 Pairs naturally with `with_` for resource-safe operations:
 
 ```python
-safe_read = tuple_error(OSError, with_.c(open)(lambda f: f.read()))
+from typedtoolz.functoolz import with_
+
+safe_read = tuple_error(OSError, with_.pc(open)(cast(Callable[[FileIO], str], lambda f: f.read())))
 ```
 
 ```python
@@ -193,6 +196,7 @@ safe_read = tuple_error(OSError, with_.c(open)(lambda f: f.read()))
 
 ```python
 import logging
+logger = logging.getLogger(__name__)
 
 def handle_request(request):
     ...
@@ -201,7 +205,7 @@ safe_handler = remap_error(
     lambda e: ("Internal error processing request", RuntimeError("500 Internal Server Error")),
     BaseException,
     handle_request,
-    logger_method=logging.error,
+    logger_method=logger.error,
 )
 ```
 
@@ -227,8 +231,8 @@ from typedtoolz.functoolz import defer
 **`defer.hof`** -- used as a decorator to guarantee cleanup runs after every call. The cleanup can receive the return of the body, but if the body raises, the cleanup receives `...` (Ellipsis) as the result:
 
 ```python
-@defer.hof(lambda result: logger.info("finished, result: %s", result))
-def process(data):
+@defer.hof.c(lambda result: logger.info("finished, result: %s", result))
+def process(data: bytes) -> str:
     ...
 ```
 
@@ -239,8 +243,10 @@ def process(data):
 **`defer.hof.defer_args`** -- two-stage: capture arguments for the cleanup first, then wrap the body:
 
 ```python
-@defer.hof.defer_args(lambda result, label: logger.info("%s: %s", label, result))
-def process(data):
+from types import EllipsisType
+
+@defer.hof.defer_args.c(cast(Callable[[str | EllipsisType, str], None], lambda result, label: logger.info("%s: %s", label, result)))
+def process(data: bytes) -> str:
     ...
 ```
 
@@ -271,7 +277,9 @@ from typedtoolz.functoolz import with_, with_op
 `with_op` flips the argument order--handy when currying the body first:
 
 ```python
-read = with_op.c(lambda f: f.read())
+from io import TextIOWrapper
+
+read = with_op.c(cast(Callable[[TextIOWrapper], str], lambda f: f.read()))
 ```
 
 ```python
@@ -282,7 +290,7 @@ read = with_op.c(lambda f: f.read())
 **`with_.p` / `with_op.p`** -- parametrised factory: the returned callable passes its arguments through to the resource factory:
 
 ```python
-read_file = with_.p(open, lambda f: f.read())
+read_file = with_.p(open, cast(Callable[[TextIOWrapper], str], lambda f: f.read()))
 ```
 
 ```python
@@ -307,8 +315,9 @@ from typedtoolz.functoolz import return_parameter as rp
 The function's own return value is discarded; the caller gets only the accumulator.
 
 ```python
-@rp.last.only(list)
-def flatten(items: list, acc: list) -> None:
+type NestedIntList = list["int | NestedIntList"]
+@rp.last.only(lambda: cast(list[int], []))
+def flatten(items: NestedIntList, acc: list[int]) -> None:
     for item in items:
         if isinstance(item, list):
             flatten(item)   # recursive--reuses the same acc
@@ -326,8 +335,8 @@ def flatten(items: list, acc: list) -> None:
 The caller gets a tuple of the accumulator and the function's scalar return value.
 
 ```python
-@rp.last.joined.in_tuple(list)
-def collect_counted(items: list, acc: list) -> int:
+@rp.last.joined.in_tuple(lambda: cast(list[int], []))
+def collect_counted(items: list[int], acc: list[int]) -> int:
     acc.extend(items)
     return len(items)
 ```
@@ -345,8 +354,8 @@ def collect_counted(items: list, acc: list) -> int:
 The function returns a tuple; the accumulator is prepended to it.
 
 ```python
-@rp.last.joined.with_tuple(list)
-def collect_stats(items: list, acc: list) -> tuple[int, int]:
+@rp.last.joined.with_tuple(lambda: cast(list[int], []))
+def collect_stats(items: list[int], acc: list[int]) -> tuple[int, int]:
     acc.extend(items)
     return (len(items), max(items))
 ```
@@ -388,8 +397,8 @@ Like `itertools.takewhile` but with an accumulator--the predicate can carry stat
 ```python
 from typedtoolz.itertoolz import takewhile_acc
 
-def under(limit):
-    def func(acc, item):
+def under(limit: int):
+    def func(acc: int, item: int):
         new = acc + item
         return (new < limit, new)   # (continue?, new_acc)
     return func
