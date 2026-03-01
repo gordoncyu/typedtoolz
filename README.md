@@ -1,6 +1,6 @@
 # typedtoolz
 
-A typed functional utility library for Python 3.12+, extending [toolz](https://toolz.readthedocs.io) with precise type signatures and additional patterns.
+A typed functional utility library for Python 3.12+, extending [toolz](https://github.com/pytoolz/toolz) with precise type signatures and additional patterns.
 
 ## Contents
 
