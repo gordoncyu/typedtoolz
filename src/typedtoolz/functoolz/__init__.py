@@ -1,4 +1,4 @@
-from .exceptions import excepts, union_error
+from .exceptions import excepts, union_error, remap_error
 from ._finalizer import finalizer
 from ._with import with_, with_op
 from ._reduce import reduce
@@ -11,6 +11,7 @@ from ._curryv import curryv
 __all__ = [
         "excepts",
         "union_error",
+        "remap_error",
         "finalizer",
         "reduce",
         "with_",

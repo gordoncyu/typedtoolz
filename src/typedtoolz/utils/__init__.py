@@ -1,4 +1,4 @@
-from typing import Any, Callable, ParamSpec, Protocol, TypeIs, ContextManager, TypeVar, TypeVarTuple, getargs
+from typing import Any, Callable, ParamSpec, Protocol, TypeIs, ContextManager, TypeVar, TypeVarTuple, get_args
 import inspect
 from inspect import Parameter
 from typing_extensions import TypeGuard
