@@ -8,4 +8,6 @@ def curry(pn_or_fn: Any, fn: Any = None, /) -> Any:  # pyright: ignore[reportAny
     return _toolz_curry(fn)  # pyright: ignore[reportAny]
 
 
-__all__ = ["curry"]
+__all__ = [
+        "curry",
+        ]

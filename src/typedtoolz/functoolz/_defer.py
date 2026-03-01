@@ -80,4 +80,6 @@ class defer(metaclass=_defer_meta):
 
         c = curry(_defer_hof_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-
+__all__ = [
+        "defer",
+        ]

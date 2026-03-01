@@ -79,9 +79,6 @@ class reduce(metaclass=_reduce_meta):
     c = curry(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     ci = curry(_reduce_meta._reduce)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
-thing = reduce(
-        lambda acc, v: acc + v,
-        [1],
-        2
-        )
-
+__all__ = [
+        "reduce",
+        ]

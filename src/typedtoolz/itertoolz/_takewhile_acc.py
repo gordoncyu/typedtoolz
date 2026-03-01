@@ -24,3 +24,7 @@ def _takewhile_acc(
     return result
 
 takewhile_acc = curryv(3, _takewhile_acc)
+
+__all__ = [
+        "takewhile_acc",
+        ]

@@ -8,3 +8,7 @@ def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], An
             x = f(x)
         return x
     return composed
+
+__all__ = [
+        "flow",
+        ]

@@ -73,3 +73,8 @@ class with_op(metaclass=_with_op_meta):
         return inner
     
     pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+__all__ = [
+        "with_",
+        "with_op",
+        ]
