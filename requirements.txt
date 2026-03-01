@@ -12,3 +12,4 @@ pytest==8.4.1
     # via typedtoolz (pyproject.toml)
 toolz==1.0.0
     # via typedtoolz (pyproject.toml)
+typing_extensions==4.15.0
