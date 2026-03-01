@@ -1,7 +1,7 @@
 from toolz.functoolz import curry as _toolz_curry
 from typing import Any
 
-def curryv(_, f: Any): # pyright: ignore[reportAny, reportExplicitAny] # purely for pyright, further defined in stub files
+def curryv(_, f: Any = None): # pyright: ignore[reportAny, reportExplicitAny] # purely for pyright, further defined in stub files
     """Curry a callable function, with n specifying the arity (required positional arguments).
 
     curryv(n, fn) -> curried fn
@@ -33,6 +33,8 @@ def curryv(_, f: Any): # pyright: ignore[reportAny, reportExplicitAny] # purely 
 
     See also: :func:`typedtoolz.functoolz.curry`.
     """
+    if f is None:
+        return lambda fn: _toolz_curry(fn)  # pyright: ignore[reportAny]
     return _toolz_curry(f) # pyright: ignore[reportAny]
 
 __all__ = [

@@ -69,6 +69,14 @@ for arity in range(1, MAX + 1):
     emit_curried(arity, fixed_only=True)   # CurriedFixedN
 
 
+# ── _CurryFixedNMaker protocols (returned by curry(n)) ────────────────
+for n in range(1, MAX + 1):
+    params     = ", ".join(tv(i) for i in range(1, n + 1))
+    fixed_gens = ", ".join([*params.split(", "), "R"])
+    print(f"class _CurryFixed{n}Maker(Protocol):")
+    print(f"    def __call__(self, fn: Callable[Concatenate[{params}, P], R], /) -> CurriedFixed{n}[{fixed_gens}]: ...\n")
+
+
 # ── curry(fn) overloads (point to CurriedN, inferred arity) ───────────
 for n in range(MAX, 0, -1):
     params = ", ".join(tv(i) for i in range(1, n + 1))
@@ -86,4 +94,9 @@ for n in range(MAX, 0, -1):
     print(
         f"def curry(pn: Literal[{n}], fn: Callable[Concatenate[{params}, P], R], /) -> CurriedFixed{n}[{fixed_gens}]: ...\n"
     )
+
+# ── curry(pn) overloads (return maker that takes fn) ──────────────────
+for n in range(MAX, 0, -1):
+    print("@overload")
+    print(f"def curry(pn: Literal[{n}], /) -> _CurryFixed{n}Maker: ...\n")
 

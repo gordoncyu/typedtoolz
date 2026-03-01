@@ -16,7 +16,7 @@ def letters(n: int) -> list[str]:
 
 
 # ─── header ────────────────────────────────────────────────────────────
-print("from typing import Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, TypeVarTuple, Unpack, overload\n")
+print("from typing import Any, Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, TypeVarTuple, Unpack, overload\n")
 
 print("P = ParamSpec('P')")
 print("Ts = TypeVarTuple('Ts')")        # for CurriedFixedV*
@@ -53,7 +53,12 @@ def emit_body(n: int, fixed_only: bool) -> None:
     )
     cls = "CurriedFixedV" if fixed_only else "CurriedV"
     print("    @overload")
-    print(f"    def __call__(self) -> '{cls}{n}[{full_gen}]': ...\n")
+    print(f"    def __call__(self) -> '{cls}{n}[{full_gen}]': ...")
+    # kwargs-only → return self (only for CurriedV*, not CurriedFixedV*)
+    if not fixed_only:
+        print("    @overload")
+        print(f"    def __call__(self, **kw: Any) -> '{cls}{n}[{full_gen}]': ...")
+    print()
 
 
 # ─── emit protocols ──────────────────────────────────────────────────
@@ -68,7 +73,15 @@ for n in range(1, MAX + 1):
     print(f"class CurriedFixedV{n}(Protocol[{g_fixed}]):")
     emit_body(n, fixed_only=True)
 
-# ─── curryv(...) overloads (unchanged) ────────────────────────────────
+# ─── _CurryVNMaker protocols (returned by curryv(n)) ─────────────────
+for n in range(1, MAX + 1):
+    ltrs   = letters(n)
+    prefix = ", ".join(ltrs)
+    gen    = ", ".join(ltrs + ["P", "R"])
+    print(f"class _CurryV{n}Maker(Protocol):")
+    print(f"    def __call__(self, f: Callable[Concatenate[{prefix}, P], R], /) -> CurriedV{n}[{gen}]: ...\n")
+
+# ─── curryv(n, f) overloads ────────────────────────────────────────────
 for n in range(MAX, 0, -1):
     ltrs = letters(n)
     prefix = ", ".join(ltrs)
@@ -77,6 +90,11 @@ for n in range(MAX, 0, -1):
     print(
         f"def curryv(pn: Literal[{n}], f: Callable[Concatenate[{prefix}, P], R], /) -> CurriedV{n}[{gen}]: ...\n"
     )
+
+# ─── curryv(n) overloads (return maker that takes f) ──────────────────
+for n in range(MAX, 0, -1):
+    print("@overload")
+    print(f"def curryv(pn: Literal[{n}], /) -> _CurryV{n}Maker: ...\n")
 
 print("@overload\ndef curryv(pn: int, f: Callable[..., R], /) -> Callable[..., R]: ...")
 

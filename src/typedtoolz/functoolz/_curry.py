@@ -25,7 +25,9 @@ def curry(pn_or_fn: Any, fn: Any = None, /) -> Any:  # pyright: ignore[reportAny
     Delegates to toolz.functoolz.curry.
     """
     if fn is None:
-        return _toolz_curry(pn_or_fn)  # pyright: ignore[reportAny]
+        if callable(pn_or_fn):
+            return _toolz_curry(pn_or_fn)  # pyright: ignore[reportAny]
+        return lambda f: _toolz_curry(f)  # pyright: ignore[reportAny]
     return _toolz_curry(fn)  # pyright: ignore[reportAny]
 
 
