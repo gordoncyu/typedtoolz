@@ -1,62 +1,75 @@
 from io import TextIOBase, UnsupportedOperation
-from typing import Callable, ContextManager, TypeVar, cast
+from typing import Callable, ContextManager, Literal, ParamSpec, TypeVar, cast
+from typing_extensions import overload, override
 from typedtoolz import identityv
 from typedtoolz.functoolz._curry import curry
-from typedtoolz.functoolz._curryv import curryv
+from typedtoolz.utils import is_context_manager, is_zero_required_callable
 
-def _wlth[A, R](res: ContextManager[A], body: Callable[[A], R]) -> R:
-    with res as val:
-        return body(val)
 
-wlth = curry(_wlth)
+A = TypeVar("A")
+R = TypeVar("R")
+Ps = ParamSpec("Ps")
 
-# with_op = curry(bring(1, _wlth))
-#
-# thing = wlth(open("asdfa"), lambda f: f.read())
-# thing = wlth(open("asdfa"))(lambda f: f.read())
-#
-# from typing import Union
-# from typedtoolz.functoolz import excepts, union_error
-# A1 = TypeVar("A1")
-# A2 = TypeVar("A2")
-# A3 = TypeVar("A3")
-#
-# file_errors = (
-#     FileNotFoundError,
-#     PermissionError,
-#     IsADirectoryError,
-#     NotADirectoryError,
-#     FileExistsError,
-#     ValueError,
-#     TypeError,
-#     UnsupportedOperation,
-#     LookupError,
-# )
-# open_errors = (
-#     ValueError,
-#     TypeError,
-#     UnsupportedOperation,
-#     BlockingIOError,
-#     InterruptedError,
-#     TimeoutError,
-#     IsADirectoryError,
-#     NotADirectoryError,
-#     PermissionError,
-#     FileNotFoundError,
-#     ConnectionResetError,
-#     ConnectionAbortedError,
-#     BrokenPipeError,
-# )
-#
-# saferead = union_error(
-#         open_errors, 
-#         with_op(
-#             cast(
-#                 Callable[[TextIOBase], str],
-#                 lambda f: f.read()
-#                 )
-#             )
-#         )
-# res = saferead(open("asdf"))
-# safereadfile = union_error(file_errors, lambda path: saferead(path))
-# res = safereadfile("asdf")
+class _with_meta(type):
+    @staticmethod
+    @override
+    def __call__(
+            res: (
+                ContextManager[A] 
+                | Callable[[], ContextManager[A]]
+                ),
+            body: Callable[[A], R],
+            ) -> R:
+        if is_context_manager(res):
+            with res as val:
+                return body(val)
+        with res() as val:
+            return body(val)
+
+class with_(metaclass=_with_meta):
+    c = curry(_with_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+    @staticmethod
+    def p(
+            res: Callable[Ps, ContextManager[A]],
+            body: Callable[[A], R],
+            ) -> Callable[Ps, R]:
+        def inner(*args: Ps.args, **kwargs: Ps.kwargs):
+            with res(*args, **kwargs) as val:
+                return body(val)
+        
+        return inner
+    
+    pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+class _with_op_meta(type):
+    @staticmethod
+    @override
+    def __call__(
+            body: Callable[[A], R],
+            res: (
+                ContextManager[A] 
+                | Callable[[], ContextManager[A]]
+                ),
+            ) -> R:
+        if is_context_manager(res):
+            with res as val:
+                return body(val)
+        with res() as val:
+            return body(val)
+
+class with_op(metaclass=_with_op_meta):
+    c = curry(_with_op_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+    @staticmethod
+    def p(
+            body: Callable[[A], R],
+            res: Callable[Ps, ContextManager[A]],
+            ) -> Callable[Ps, R]:
+        def inner(*args: Ps.args, **kwargs: Ps.kwargs):
+            with res(*args, **kwargs) as val:
+                return body(val)
+        
+        return inner
+    
+    pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]

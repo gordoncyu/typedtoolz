@@ -1,6 +1,6 @@
 from .exceptions import excepts, union_error
 from ._finalizer import finalizer
-from ._with import wlth
+from ._with import with_, with_op
 from ._reduce import reduce
 from . import _return_parameter as return_parameter
 from ._pipe import pipe
@@ -13,7 +13,8 @@ __all__ = [
         "union_error",
         "finalizer",
         "reduce",
-        "wlth",
+        "with_",
+        "with_op",
         "return_parameter",
         "pipe",
         "flow",
