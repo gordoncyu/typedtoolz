@@ -1,5 +1,5 @@
 from .exceptions import excepts, union_error, tuple_error, remap_error
-from ._finalizer import finalizer
+from ._defer import defer
 from ._with import with_, with_op
 from ._reduce import reduce
 from . import _return_parameter as return_parameter
@@ -13,7 +13,7 @@ __all__ = [
         "union_error",
         "tuple_error",
         "remap_error",
-        "finalizer",
+        "defer",
         "reduce",
         "with_",
         "with_op",
