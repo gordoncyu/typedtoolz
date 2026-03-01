@@ -2,6 +2,26 @@
 
 A typed functional utility library for Python 3.12+, extending [toolz](https://toolz.readthedocs.io) with precise type signatures and additional patterns.
 
+## Contents
+
+- [Installation](#installation)
+- [Overview](#overview)
+- [functoolz](#functoolz)
+  - [`curry` / `curryv`](#curry--curryv)
+  - [`pipe` / `flow`](#pipe--flow)
+  - [`reduce`](#reduce)
+  - [`excepts` / `union_error` / `tuple_error` / `remap_error`](#excepts--union_error--tuple_error--remap_error)
+  - [`defer`](#defer)
+  - [`with_` / `with_op`](#with_--with_op)
+  - [`return_parameter`](#return_parameter)
+- [itertoolz](#itertoolz)
+  - [`map`](#map)
+  - [`takewhile_acc`](#takewhile_acc)
+- [Root utilities](#root-utilities)
+- [Requirements](#requirements)
+
+---
+
 ## Installation
 
 ```bash
