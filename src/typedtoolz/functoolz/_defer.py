@@ -21,7 +21,7 @@ class _defer_meta(type):
     def __call__(
             end: Callable[[], object],
             body: Callable[[], R],
-            ):
+            ) -> R:
         try:
             return body()
         finally:
@@ -50,7 +50,7 @@ class _defer_hof_meta(type):
 
 BR = TypeVar("BR", contravariant=True)
 class AcceptsBodyReturn(Protocol[BR, Ps]):
-    def __call__(self, defer_body_return: BR | EllipsisType, *args: Ps.args, **kwargs: Ps.kwargs) -> Any: ... # pyright: ignore[reportExplicitAny, reportAny]
+    def __call__(self, defer_body_return: BR | EllipsisType, /, *args: Ps.args, **kwargs: Ps.kwargs) -> Any: ... # pyright: ignore[reportExplicitAny, reportAny]
 
 class _defer_hof_defer_args_meta(type):
     @staticmethod
