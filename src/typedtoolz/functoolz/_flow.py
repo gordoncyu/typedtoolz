@@ -16,6 +16,7 @@ def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], An
         pipe
     """
     def composed(x: T) -> Any:
+        x = fn(x)
         for f in fns:
             x = f(x)
         return x

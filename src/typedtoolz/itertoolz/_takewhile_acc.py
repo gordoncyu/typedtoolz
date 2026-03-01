@@ -61,7 +61,6 @@ class _takewhile_acc_meta(type):
             acc = initial
 
         result: list[T] = []
-        acc = initial
 
         for item in it:
             match func(acc, item):

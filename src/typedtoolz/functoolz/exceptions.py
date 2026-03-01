@@ -80,7 +80,7 @@ class _tuple_error_meta(type):
             return (False, e)
         return excepts(handler, exc, inner)
 
-class tuple_error(metaclass=_union_error_meta):
+class tuple_error(metaclass=_tuple_error_meta):
     """Wrap func to return a success/failure tuple instead of raising.
 
     tuple_error(exc, func) -> Callable[Ps, tuple[True, B] | tuple[False, E]]
@@ -114,7 +114,7 @@ class _remap_error_meta(type):
 
         return wrapper
 
-class remap_error(metaclass=_union_error_meta):
+class remap_error(metaclass=_remap_error_meta):
     """Wrap func to catch exc, remap it via handler, and re-raise the remapped exception.
 
     remap_error(handler, exc, func[, logger_method]) -> Callable[Ps, B]
