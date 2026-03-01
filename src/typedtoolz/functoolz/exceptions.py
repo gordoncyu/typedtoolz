@@ -1,4 +1,4 @@
-from typing import Any, Callable, ParamSpec, TypeVar, get_args
+from typing import Any, Callable, Literal, ParamSpec, TypeVar, get_args
 from typing_extensions import override
 from typedtoolz import identity
 from typedtoolz.functoolz._curry import curry
@@ -48,6 +48,23 @@ class _union_error_meta(type):
 class union_error(metaclass=_union_error_meta):
     c = curry(_union_error_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
+class _tuple_error_meta(type):
+    @staticmethod
+    @override
+    def __call__(
+            exc: type[E] | tuple[type[E]],
+            func: Callable[Ps, B],
+            ) -> Callable[Ps, tuple[Literal[True], B] | tuple[Literal[False], E]]:
+        @wraps(func)
+        def inner(*args: Ps.args, **kwargs: Ps.kwargs):
+            return (True, func(*args, **kwargs))
+        def handler(e: E):
+            return (False, e)
+        return excepts(handler, exc, inner)
+
+class tuple_error(metaclass=_union_error_meta):
+    c = curry(_tuple_error_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+
 class _remap_error_meta(type):
     @staticmethod
     @override
@@ -76,5 +93,6 @@ class remap_error(metaclass=_union_error_meta):
 __all__ = [
         "excepts",
         "union_error",
+        "tuple_error",
         "remap_error",
         ]
