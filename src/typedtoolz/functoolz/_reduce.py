@@ -74,7 +74,7 @@ class reduce(metaclass=_reduce_meta):
     For example, reduce(lambda x, y: x+y, [1, 2, 3, 4, 5])
     calculates ((((1 + 2) + 3) + 4) + 5).
 
-    Has curried versions as properties prefixed with c
+    Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     ci = curry(_reduce_meta._reduce)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]

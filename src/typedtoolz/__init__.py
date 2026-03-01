@@ -31,10 +31,13 @@ Ts = TypeVarTuple("Ts")
 Ps = ParamSpec("Ps")
 
 def identity(x: A) -> A:
+    """Return x unchanged."""
     return x
 
 def identityv(*args: *Ts) -> tuple[*Ts]:
+    """Return all positional arguments as a tuple, unchanged."""
     return args
 
 def return_none(*_: TypeVarTuple, **__: object) -> None:
+    """Accept any arguments and return None."""
     return None

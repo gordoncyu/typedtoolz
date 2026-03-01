@@ -42,7 +42,7 @@ class map(metaclass=_map_meta):
     If strict is true and one of the arguments is exhausted before the others,
     raise a ValueError.
 
-    Has a curried version as the property c
+    Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curryv(2, _map_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 

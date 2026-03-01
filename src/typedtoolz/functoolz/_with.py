@@ -27,6 +27,15 @@ class _with_meta(type):
             return body(val)
 
 class with_(metaclass=_with_meta):
+    """Open a context manager and pass the managed value to body.
+
+    with_(res, body) -> R
+
+    res may be a ContextManager directly or a zero-argument callable that
+    produces one. body receives the value yielded by __enter__.
+
+    Has curried versions as the properties c and pc (see :func:`typedtoolz.functoolz.curry`).
+    """
     c = curry(_with_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
     @staticmethod
@@ -34,6 +43,13 @@ class with_(metaclass=_with_meta):
             res: Callable[Ps, ContextManager[A]],
             body: Callable[[A], R],
             ) -> Callable[Ps, R]:
+        """Create a callable that opens res(*args) and passes the value to body.
+
+        with_.p(res, body) -> Callable[Ps, R]
+
+        res is a parametrized context manager factory; the returned callable
+        accepts the same arguments and applies body inside the context.
+        """
         def inner(*args: Ps.args, **kwargs: Ps.kwargs):
             with res(*args, **kwargs) as val:
                 return body(val)
@@ -59,6 +75,18 @@ class _with_op_meta(type):
             return body(val)
 
 class with_op(metaclass=_with_op_meta):
+    """Open a context manager and pass the managed value to body (body-first argument order).
+
+    with_op(body, res) -> R
+
+    res may be a ContextManager directly or a zero-argument callable that
+    produces one. body receives the value yielded by __enter__.
+
+    Argument order is flipped relative to with_ — body comes first, res second
+    — which makes it more natural to curry body before supplying the resource.
+
+    Has curried versions as the properties c and pc (see :func:`typedtoolz.functoolz.curry`).
+    """
     c = curry(_with_op_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
     @staticmethod
@@ -66,6 +94,16 @@ class with_op(metaclass=_with_op_meta):
             body: Callable[[A], R],
             res: Callable[Ps, ContextManager[A]],
             ) -> Callable[Ps, R]:
+        """Create a callable that opens res(*args) and passes the managed value to body.
+
+        with_op.p(body, res) -> Callable[Ps, R]
+
+        res is a parametrized context manager factory; the returned callable
+        accepts the same arguments and applies body inside the context.
+
+        Argument order is flipped relative to with_.p — body comes first, res
+        second.
+        """
         def inner(*args: Ps.args, **kwargs: Ps.kwargs):
             with res(*args, **kwargs) as val:
                 return body(val)

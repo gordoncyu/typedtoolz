@@ -80,6 +80,21 @@ class _takewhile_acc_meta(type):
         return result
 
 class takewhile_acc(metaclass=_takewhile_acc_meta):
+    """Take items from iterable while an accumulator-based predicate holds.
+
+    takewhile_acc(func, iterable[, initial], *, take_first_negative=False) -> list[T]
+
+    func receives ``(accumulator, item)`` and must return either:
+      - ``(bool, new_acc)``: a tuple of (continue?, new accumulator)
+      - ``{"take": bool, key: new_acc}``: a TypedDict with the same semantics
+
+    Iteration stops when func returns False. If take_first_negative is True,
+    the first item that fails the predicate is included in the result.
+    When no initial is provided, the first element of the iterable is used
+    as the initial accumulator.
+
+    Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
+    """
     c = curryv(2, _takewhile_acc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     ci = curryv(3, _takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 

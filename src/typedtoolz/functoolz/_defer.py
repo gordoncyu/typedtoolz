@@ -73,9 +73,37 @@ class _defer_hof_defer_args_meta(type):
         return earg_acc
 
 class defer(metaclass=_defer_meta):
+    """Run body(), calling end() in a finally block regardless of outcome.
+
+    defer(end, body) -> R
+
+    end is a zero-argument callable. body is a zero-argument callable whose
+    return value is passed through. Analogous to a try/finally block.
+
+    Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
+    """
     c = curry(_defer_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     class hof(metaclass=_defer_hof_meta):
+        """Wrap body so that end is called after each invocation.
+
+        defer.hof(end, body) -> Callable[PBody, R]
+
+        end may be zero-argument, or accept a single argument: the body's
+        return value (or ``...`` if the body raised an exception).
+
+        Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
+        """
         class defer_args(metaclass=_defer_hof_defer_args_meta):
+            """Wrap body with a deferred end that also captures extra arguments.
+
+            defer.hof.defer_args(end, body) -> Callable[PEnd, Callable[PBody, R]]
+
+            Returns a two-stage callable: first call captures the arguments for
+            end; second call wraps body and invokes end(body_result, *eargs,
+            **ekwargs) in a finally block.
+
+            Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
+            """
             c = curry(_defer_hof_defer_args_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
         c = curry(_defer_hof_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
