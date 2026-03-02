@@ -7,6 +7,15 @@ from ._pipe import pipe
 from ._flow import flow
 from ._curry import curry
 from ._curryv import curryv
+from ._compose import compose
+from ._compose_left import compose_left
+from ._thread import thread_first, thread_last
+from ._memoize import memoize
+from ._juxt import juxt
+from ._do import do
+from ._flip import flip
+from ._complement import complement
+from ._apply import apply
 
 __all__ = [
         "excepts",
@@ -22,5 +31,15 @@ __all__ = [
         "flow",
         "curry",
         "curryv",
+        "compose",
+        "compose_left",
+        "thread_first",
+        "thread_last",
+        "memoize",
+        "juxt",
+        "do",
+        "flip",
+        "complement",
+        "apply",
         ]
 

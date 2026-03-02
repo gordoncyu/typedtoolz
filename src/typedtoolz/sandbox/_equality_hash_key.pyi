@@ -1,0 +1,19 @@
+from collections.abc import Callable, Hashable
+from typing import Generic, TypeVar
+from typing_extensions import override
+
+T = TypeVar('T')
+
+class EqualityHashKey(Generic[T]):
+    item: T
+    def __init__(self, key: Callable[[T], Hashable] | int | None, item: T) -> None: ...
+    @override
+    def __hash__(self) -> int: ...
+    @override
+    def __eq__(self, other: object) -> bool: ...
+    @override
+    def __ne__(self, other: object) -> bool: ...
+    @override
+    def __str__(self) -> str: ...
+    @override
+    def __repr__(self) -> str: ...

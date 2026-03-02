@@ -1,0 +1,16 @@
+from collections.abc import Callable, Iterable
+from typing import TypeVar, overload
+
+T = TypeVar('T')
+K = TypeVar('K')
+A = TypeVar('A')
+
+def groupby(key: Callable[[T], K], seq: Iterable[T]) -> dict[K, list[T]]: ...
+
+@overload
+def reduceby(key: Callable[[T], K], binop: Callable[[T, T], T], seq: Iterable[T]) -> dict[K, T]: ...
+@overload
+def reduceby(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A) -> dict[K, A]: ...
+
+def frequencies(seq: Iterable[T]) -> dict[T, int]: ...
+def countby(key: Callable[[T], K], seq: Iterable[T]) -> dict[K, int]: ...

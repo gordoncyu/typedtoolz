@@ -1,0 +1,39 @@
+from collections.abc import Iterable, Iterator
+from typing import TypeVar, overload
+
+A1 = TypeVar('A1')
+A2 = TypeVar('A2')
+A3 = TypeVar('A3')
+A4 = TypeVar('A4')
+A5 = TypeVar('A5')
+A6 = TypeVar('A6')
+A7 = TypeVar('A7')
+A8 = TypeVar('A8')
+A9 = TypeVar('A9')
+A10 = TypeVar('A10')
+T = TypeVar('T')
+
+@overload
+def unzip(seq: Iterable[tuple[A1]]) -> tuple[Iterator[A1]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2]]) -> tuple[Iterator[A1], Iterator[A2]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5, A6]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5], Iterator[A6]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5, A6, A7]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5], Iterator[A6], Iterator[A7]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5, A6, A7, A8]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5], Iterator[A6], Iterator[A7], Iterator[A8]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5], Iterator[A6], Iterator[A7], Iterator[A8], Iterator[A9]]: ...
+@overload
+def unzip(seq: Iterable[tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10]]) -> tuple[Iterator[A1], Iterator[A2], Iterator[A3], Iterator[A4], Iterator[A5], Iterator[A6], Iterator[A7], Iterator[A8], Iterator[A9], Iterator[A10]]: ...
+@overload
+def unzip(seq: Iterable[tuple[T, ...]]) -> tuple[Iterator[T], ...]: ...
+@overload
+def unzip(seq: Iterable[Iterable[T]]) -> tuple[Iterator[T], ...]: ...
