@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate overloads for nth, first, second, last with fixed-size tuple support.
+Generate overloads for nth, first, second, last, rest, peek, peekn.
 
 nth(Literal[i], tuple[A1, ..., A{i+1}, *Ts]) -> A{i+1}
 first(tuple[T, *Ts]) -> T
@@ -15,7 +15,8 @@ import sys
 MAX = int(sys.argv[1]) if len(sys.argv) > 1 else 10
 
 # ── header ────────────────────────────────────────────────────────────
-print("from typing import Iterable, Iterator, Literal, TypeVar, TypeVarTuple, Unpack, overload\n")
+print("from collections.abc import Iterable, Iterator")
+print("from typing import Literal, TypeVar, TypeVarTuple, overload\n")
 
 print("T = TypeVar('T')")
 print("A1 = TypeVar('A1')")
@@ -52,6 +53,6 @@ print("@overload")
 print("def last(seq: Iterable[T]) -> T: ...\n")
 
 # ── rest / peek / peekn ───────────────────────────────────────────────
-print("def rest(seq: Iterable[T]) -> Iterator[T]: ...\n") # TODO: tuple
-print("def peek(seq: Iterable[T]) -> tuple[T, Iterator[T]]: ...\n") # TODO: tuple
+print("def rest(seq: Iterable[T]) -> Iterator[T]: ...\n")
+print("def peek(seq: Iterable[T]) -> tuple[T, Iterator[T]]: ...\n")
 print("def peekn(n: int, seq: Iterable[T]) -> tuple[list[T], Iterator[T]]: ...")

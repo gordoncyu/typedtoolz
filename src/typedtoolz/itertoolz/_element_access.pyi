@@ -1,4 +1,5 @@
-from typing import Iterable, Iterator, Literal, TypeVar, TypeVarTuple, Unpack, overload
+from collections.abc import Iterable, Iterator
+from typing import Literal, TypeVar, TypeVarTuple, overload
 
 T = TypeVar('T')
 A1 = TypeVar('A1')
