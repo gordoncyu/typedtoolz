@@ -1,11 +1,8 @@
 from collections.abc import Iterable, Mapping
 from typing import Callable, TypeVar, overload
+from typing_extensions import ParamSpec
 
-R = TypeVar('R')
+R = TypeVar("R")
+Ps = ParamSpec("Ps")
 
-@overload
-def apply(func: Callable[[], R]) -> R: ...
-@overload
-def apply(func: Callable[..., R], args: Iterable[object]) -> R: ...
-@overload
-def apply(func: Callable[..., R], args: Iterable[object], kwargs: Mapping[str, object]) -> R: ...
+def apply(func: Callable[Ps, R], *args: Ps.args, **kwargs: Ps.kwargs) -> R: ...
