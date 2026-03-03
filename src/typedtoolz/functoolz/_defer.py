@@ -72,7 +72,7 @@ class _defer_hof_defer_args_meta(type):
             return barg_acc
         return earg_acc
 
-class defer(metaclass=_defer_meta):
+class _defer(metaclass=_defer_meta):
     """Run body(), calling end() in a finally block regardless of outcome.
 
     defer(end, body) -> R
@@ -107,6 +107,8 @@ class defer(metaclass=_defer_meta):
             c = curry(_defer_hof_defer_args_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
         c = curry(_defer_hof_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+defer = _defer  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
 
 __all__ = [
         "defer",

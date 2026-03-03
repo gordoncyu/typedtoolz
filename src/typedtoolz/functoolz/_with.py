@@ -26,7 +26,7 @@ class _with_meta(type):
         with res() as val:
             return body(val)
 
-class with_(metaclass=_with_meta):
+class _with_(metaclass=_with_meta):
     """Open a context manager and pass the managed value to body.
 
     with_(res, body) -> R
@@ -58,6 +58,8 @@ class with_(metaclass=_with_meta):
     
     pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
 
+with_ = _with_  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+
 class _with_op_meta(type):
     @staticmethod
     @override
@@ -74,7 +76,7 @@ class _with_op_meta(type):
         with res() as val:
             return body(val)
 
-class with_op(metaclass=_with_op_meta):
+class _with_op(metaclass=_with_op_meta):
     """Open a context manager and pass the managed value to body (body-first argument order).
 
     with_op(body, res) -> R
@@ -111,6 +113,8 @@ class with_op(metaclass=_with_op_meta):
         return inner
     
     pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
+
+with_op = _with_op  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
 
 __all__ = [
         "with_",
