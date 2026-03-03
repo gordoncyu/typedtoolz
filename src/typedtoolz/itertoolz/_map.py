@@ -34,7 +34,7 @@ class _map_meta(type):
                 ) -> Iterator[_S]:
             return cymap(func, iterable, *iterables)
 
-class _map(metaclass=_map_meta):
+class _map(metaclass=_map_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """
     Make an iterator that computes the function using arguments from
     each of the iterables.  Stops when the shortest iterable is exhausted.
@@ -46,7 +46,7 @@ class _map(metaclass=_map_meta):
     """
     c = curryv(2, _map_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-map = _map  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+map = _map  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "map",

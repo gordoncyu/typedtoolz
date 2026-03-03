@@ -52,7 +52,7 @@ class _reduce_meta(type):
         else:
             return cyreduce(function, sequence, initial)
 
-class _reduce(metaclass=_reduce_meta):
+class _reduce(metaclass=_reduce_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """
     reduce(function, iterable[, initial], /) -> value
 
@@ -70,7 +70,7 @@ class _reduce(metaclass=_reduce_meta):
     c = curry(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     ci = curry(_reduce_meta._reduce)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
-reduce = _reduce  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+reduce = _reduce  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "reduce",

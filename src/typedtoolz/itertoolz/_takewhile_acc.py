@@ -78,7 +78,7 @@ class _takewhile_acc_meta(type):
 
         return result
 
-class _takewhile_acc(metaclass=_takewhile_acc_meta):
+class _takewhile_acc(metaclass=_takewhile_acc_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """Take items from iterable while an accumulator-based predicate holds.
 
     takewhile_acc(func, iterable[, initial], *, take_first_negative=False) -> list[T]
@@ -97,7 +97,7 @@ class _takewhile_acc(metaclass=_takewhile_acc_meta):
     c = curryv(2, _takewhile_acc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
     ci = curryv(3, _takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
-takewhile_acc = _takewhile_acc  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+takewhile_acc = _takewhile_acc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "takewhile_acc",

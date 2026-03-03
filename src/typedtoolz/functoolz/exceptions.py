@@ -26,7 +26,7 @@ class _excepts_meta(type):
     ) -> Callable[Ps, B | D]:
         return cyexcepts(exc, func, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
-class _excepts(metaclass=_excepts_meta):
+class _excepts(metaclass=_excepts_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """Wrap func to catch exc and pass the exception to handler.
 
     excepts(handler, exc, func) -> Callable[Ps, B | D]
@@ -38,7 +38,7 @@ class _excepts(metaclass=_excepts_meta):
     """
     c = curry(_excepts_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-excepts = _excepts  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+excepts = _excepts  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 class _union_error_meta(type):
     @staticmethod
@@ -49,7 +49,7 @@ class _union_error_meta(type):
             ) -> Callable[Ps, B | E]:
         return excepts(identity, exc, func)
 
-class _union_error(metaclass=_union_error_meta):
+class _union_error(metaclass=_union_error_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """Wrap func so that a caught exception is returned rather than raised.
 
     union_error(exc, func) -> Callable[Ps, B | E]
@@ -61,7 +61,7 @@ class _union_error(metaclass=_union_error_meta):
     """
     c = curry(_union_error_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-union_error = _union_error  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+union_error = _union_error  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 class _tuple_error_meta(type):
     @staticmethod
@@ -77,7 +77,7 @@ class _tuple_error_meta(type):
             return (False, e)
         return excepts(handler, exc, inner)
 
-class _tuple_error(metaclass=_tuple_error_meta):
+class _tuple_error(metaclass=_tuple_error_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """Wrap func to return a success/failure tuple instead of raising.
 
     tuple_error(exc, func) -> Callable[Ps, tuple[True, B] | tuple[False, E]]
@@ -89,7 +89,7 @@ class _tuple_error(metaclass=_tuple_error_meta):
     """
     c = curry(_tuple_error_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-tuple_error = _tuple_error  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+tuple_error = _tuple_error  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 class _remap_error_meta(type):
     @staticmethod
@@ -113,7 +113,7 @@ class _remap_error_meta(type):
 
         return wrapper
 
-class _remap_error(metaclass=_remap_error_meta):
+class _remap_error(metaclass=_remap_error_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
     """Wrap func to catch exc, remap it via handler, and re-raise the remapped exception.
 
     remap_error(handler, exc, func[, logger_method]) -> Callable[Ps, B]
@@ -126,7 +126,7 @@ class _remap_error(metaclass=_remap_error_meta):
     """
     c = curry(_remap_error_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-remap_error = _remap_error  # why am I doing this? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+remap_error = _remap_error  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "excepts",
