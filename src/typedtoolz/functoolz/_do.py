@@ -1,3 +1,3 @@
-from toolz.functoolz import do
+from cytoolz.functoolz import do
 
 __all__ = ["do"]

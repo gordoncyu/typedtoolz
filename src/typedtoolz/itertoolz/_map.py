@@ -2,7 +2,7 @@ from collections.abc import Iterable, Iterator
 from typing import Callable, TypeVar
 from typing_extensions import Any, overload, override
 from typedtoolz.functoolz import curry, curryv
-from builtins import map as rmap
+from builtins import map as cymap
 import sys
 
 _T1 = TypeVar("_T1")
@@ -22,7 +22,7 @@ class _map_meta(type):
                 *iterables: Iterable[Any],  # pyright: ignore[reportExplicitAny]
                 strict: bool = False,
                 ) -> Iterator[_S]:
-            return rmap(func, iterable, *iterables, strict=strict)  # pyright: ignore[reportCallIssue]
+            return cymap(func, iterable, *iterables, strict=strict)  # pyright: ignore[reportCallIssue]
     else:
         @staticmethod
         @override
@@ -32,7 +32,7 @@ class _map_meta(type):
                 /,
                 *iterables: Iterable[Any],  # pyright: ignore[reportExplicitAny]
                 ) -> Iterator[_S]:
-            return rmap(func, iterable, *iterables)
+            return cymap(func, iterable, *iterables)
 
 class map(metaclass=_map_meta):
     """

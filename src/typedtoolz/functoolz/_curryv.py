@@ -1,4 +1,4 @@
-from toolz.functoolz import curry as _toolz_curry
+from cytoolz.functoolz import curry as _toolz_curry
 from typing import Any
 
 def curryv(_, f: Any = None): # pyright: ignore[reportAny, reportExplicitAny] # purely for pyright, further defined in stub files

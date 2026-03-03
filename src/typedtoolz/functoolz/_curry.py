@@ -1,4 +1,4 @@
-from toolz.functoolz import curry as _toolz_curry
+from cytoolz.functoolz import curry as _toolz_curry
 from typing import Any
 
 

@@ -1,3 +1,3 @@
-from toolz.functoolz import complement
+from cytoolz.functoolz import complement
 
 __all__ = ["complement"]

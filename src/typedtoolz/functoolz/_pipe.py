@@ -1,4 +1,4 @@
-from toolz.functoolz import pipe
+from cytoolz.functoolz import pipe
 
 __all__ = [
         "pipe",

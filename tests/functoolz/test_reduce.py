@@ -29,7 +29,7 @@ def test_empty_with_initial():
     assert reduce(lambda a, b: a + b, [], 99) == 99  # pyright: ignore[reportOperatorIssue, reportUnknownLambdaType]
 
 def test_empty_no_initial_raises():
-    with pytest.raises(TypeError, match="reduce\\(\\) of empty sequence with no initial value"):
+    with pytest.raises(TypeError, match="reduce\\(\\) of empty iterable with no initial value"):
         reduce(lambda a, b: a + b, cast(list[int], []))
 
 def test_string_concat():

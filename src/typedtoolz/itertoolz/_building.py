@@ -1,5 +1,5 @@
 # TODO: convert to class with .c property
-from toolz.itertoolz import (
+from cytoolz.itertoolz import (
     remove, accumulate, cons, interpose, interleave,
     iterate, concat, concatv, mapcat,
 )

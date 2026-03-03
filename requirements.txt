@@ -10,6 +10,6 @@ pygments==2.19.2
     # via pytest
 pytest==8.4.1
     # via typedtoolz (pyproject.toml)
-toolz==1.0.0
+cytoolz==1.0.0
     # via typedtoolz (pyproject.toml)
 typing_extensions==4.15.0

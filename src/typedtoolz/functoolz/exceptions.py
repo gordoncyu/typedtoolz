@@ -1,3 +1,4 @@
+from cytoolz import excepts as cyexcepts
 from typing import Any, Callable, Literal, ParamSpec, TypeVar, get_args
 from typing_extensions import override
 from typedtoolz import identity
@@ -23,14 +24,7 @@ class _excepts_meta(type):
         exc: type[E] | tuple[type[E]],
         func: Callable[Ps, B],
     ) -> Callable[Ps, B | D]:
-        @wraps(func)
-        def wrapper(*args: Ps.args, **kwargs: Ps.kwargs) -> B | D:
-            try:
-                return func(*args, **kwargs)
-            except exc as err:
-                return handler(err)
-
-        return wrapper
+        return cyexcepts(exc, func, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
 class excepts(metaclass=_excepts_meta):
     """Wrap func to catch exc and pass the exception to handler.

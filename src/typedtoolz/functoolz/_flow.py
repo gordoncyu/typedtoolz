@@ -1,3 +1,4 @@
+from cytoolz import compose_left
 from typing import Any, Callable, TypeVar
 
 
@@ -15,12 +16,7 @@ def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], An
     See Also:
         pipe
     """
-    def composed(x: T) -> Any:
-        x = fn(x)
-        for f in fns:
-            x = f(x)
-        return x
-    return composed
+    return compose_left(fn, *fns)
 
 __all__ = [
         "flow",

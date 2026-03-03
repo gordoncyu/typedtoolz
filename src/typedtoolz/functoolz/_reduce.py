@@ -2,6 +2,7 @@ from typing import Callable, TypeVar, cast, get_args
 from collections.abc import Iterable
 from typing_extensions import overload, override
 from typedtoolz.functoolz._curry import curry
+from functools import reduce as cyreduce
 
 A = TypeVar("A")
 R = TypeVar("R")
@@ -36,20 +37,7 @@ class _reduce_meta(type):
             initial: R,
             sequence: Iterable[A], 
             ) -> R:
-        it = iter(sequence)
-
-        if initial is _initial_missing:
-            try:
-                value = next(it)
-            except StopIteration:
-                raise TypeError("reduce() of empty sequence with no initial value") from None
-        else:
-            value = initial
-
-        for element in it:
-            value = function(value, element)
-
-        return value  # pyright: ignore[reportReturnType]
+        return cyreduce(function, sequence, initial)
 
     @classmethod
     @override
@@ -59,7 +47,10 @@ class _reduce_meta(type):
             sequence: Iterable[A], 
             initial: R = cast(R, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
             ) -> R:
-        return cls._reduce(function, initial, sequence)
+        if initial is _initial_missing:
+            return cyreduce(function, sequence)  # pyright: ignore[reportReturnType, reportArgumentType]
+        else:
+            return cyreduce(function, sequence, initial)
 
 class reduce(metaclass=_reduce_meta):
     """

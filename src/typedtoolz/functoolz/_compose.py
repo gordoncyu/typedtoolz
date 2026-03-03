@@ -1,3 +1,3 @@
-from toolz.functoolz import compose
+from cytoolz.functoolz import compose
 
 __all__ = ["compose"]
