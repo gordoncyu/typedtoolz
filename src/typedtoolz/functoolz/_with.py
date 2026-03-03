@@ -26,7 +26,7 @@ class _with_meta(type):
         with res() as val:
             return body(val)
 
-class _with_(metaclass=_with_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+class _with_(metaclass=_with_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Open a context manager and pass the managed value to body.
 
     with_(res, body) -> R
@@ -58,7 +58,7 @@ class _with_(metaclass=_with_meta):  # See: https://github.com/gordoncyu/typedto
     
     pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-with_ = _with_  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
+with_ = _with_  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 class _with_op_meta(type):
     @staticmethod
@@ -76,7 +76,7 @@ class _with_op_meta(type):
         with res() as val:
             return body(val)
 
-class _with_op(metaclass=_with_op_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+class _with_op(metaclass=_with_op_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Open a context manager and pass the managed value to body (body-first argument order).
 
     with_op(body, res) -> R
@@ -114,7 +114,7 @@ class _with_op(metaclass=_with_op_meta):  # See: https://github.com/gordoncyu/ty
     
     pc = curry(p)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-with_op = _with_op  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
+with_op = _with_op  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "with_",

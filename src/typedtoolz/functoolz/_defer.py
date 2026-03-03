@@ -72,7 +72,7 @@ class _defer_hof_defer_args_meta(type):
             return barg_acc
         return earg_acc
 
-class _defer(metaclass=_defer_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+class _defer(metaclass=_defer_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Run body(), calling end() in a finally block regardless of outcome.
 
     defer(end, body) -> R
@@ -83,7 +83,7 @@ class _defer(metaclass=_defer_meta):  # See: https://github.com/gordoncyu/typedt
     Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(_defer_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    class hof(metaclass=_defer_hof_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+    class hof(metaclass=_defer_hof_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
         """Wrap body so that end is called after each invocation.
 
         defer.hof(end, body) -> Callable[PBody, R]
@@ -93,7 +93,7 @@ class _defer(metaclass=_defer_meta):  # See: https://github.com/gordoncyu/typedt
 
         Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
         """
-        class defer_args(metaclass=_defer_hof_defer_args_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md
+        class defer_args(metaclass=_defer_hof_defer_args_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
             """Wrap body with a deferred end that also captures extra arguments.
 
             defer.hof.defer_args(end, body) -> Callable[PEnd, Callable[PBody, R]]
@@ -108,7 +108,7 @@ class _defer(metaclass=_defer_meta):  # See: https://github.com/gordoncyu/typedt
 
         c = curry(_defer_hof_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
-defer = _defer  # why? See: https://github.com/gordoncyu/typedtoolz/blob/master/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
+defer = _defer  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = [
         "defer",
