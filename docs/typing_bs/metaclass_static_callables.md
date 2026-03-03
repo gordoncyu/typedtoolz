@@ -51,7 +51,7 @@ class reduce()
 Initialize self.  See help(type(self)) for accurate signature.
 ```
 
-Huh. 
+Weird. 
 
 
 ```python
