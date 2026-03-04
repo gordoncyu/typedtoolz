@@ -1,7 +1,7 @@
 from typing import Callable, TypeVar, cast, get_args
 from collections.abc import Iterable
 from typing_extensions import overload, override
-from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 from functools import reduce as cyreduce
 
 A = TypeVar("A")
@@ -14,35 +14,35 @@ _initial_missing = object()
 # all so I can use pipe more ergonomically.
 class _reduce_meta(type):
     # Following __call__ overloads structured to be compatible with functools.reduce
-    @classmethod
+    @staticmethod
     @overload
     def __call__(
-            cls,
             function: Callable[[A, A], A],
             sequence: Iterable[A], 
             ) -> A: ...
-    @classmethod
+    @staticmethod
     @overload
     def __call__(
-            cls,
             function: Callable[[R, A], R],
             sequence: Iterable[A], 
             initial: R = cast(R, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
             ) -> R: ...
 
+    @staticmethod
+    @override
+    def _reduce( # Because you can't pick a specific override to pass to a function this is a copy of the below
+            function: Callable[[A | R, A], R],
+            sequence: Iterable[A], 
+            initial: R = cast(R, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
+            ) -> R:
+        if initial is _initial_missing:
+            return cyreduce(function, sequence)  # pyright: ignore[reportReturnType, reportArgumentType]
+        else:
+            return cyreduce(function, sequence, initial)
 
     @staticmethod
-    def _reduce(
-            function: Callable[[A | R, A], R],
-            initial: R,
-            sequence: Iterable[A], 
-            ) -> R:
-        return cyreduce(function, sequence, initial)
-
-    @classmethod
     @override
     def __call__(  # pyright: ignore[reportInconsistentOverload]
-             cls,
             function: Callable[[A | R, A], R],
             sequence: Iterable[A], 
             initial: R = cast(R, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
@@ -67,8 +67,7 @@ class _reduce(metaclass=_reduce_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    ci = curry(_reduce_meta._reduce)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curryv(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 reduce = _reduce  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 

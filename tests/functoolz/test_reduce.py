@@ -39,7 +39,7 @@ def test_generator_input():
     assert reduce(lambda a, b: a + b, (x for x in [1, 2, 3])) == 6
 
 
-# ── reduce.c (curry(2, reduce)) — curries function + sequence ─────────────────
+# ── reduce.c ──────────────────────────────────────────────────────────────────
 
 def test_c_curried_function_then_sequence():
     add = reduce.c(lambda a, b: a + b)
@@ -49,16 +49,19 @@ def test_c_fully_applied():
     assert reduce.c(lambda a, b: a + b, [1, 2, 3]) == 6
 
 
-# ── reduce.ci (curry(reduce._reduce)) — curries function + sequence + initial ──
+# ── reduce.c with initial (new: __call__ staticmethod exposes initial param) ───
 
-def test_ci_fully_applied():
-    assert reduce.ci(lambda a, b: a + b, 0, [1, 2, 3]) == 6
+def test_c_with_initial_two_step():
+    fn = reduce.c(lambda a, b: a + b)
+    assert fn([1, 2, 3], 10) == 16
 
-def test_ci_curried_step_by_step():
-    step1 = reduce.ci(lambda a, b: a + b)
-    step2 = step1(0)
-    assert step2([1, 2, 3]) == 6
+def test_c_with_initial_fully_applied():
+    assert reduce.c(lambda a, b: a + b, [1, 2, 3], 10) == 16
 
-def test_ci_with_heterogeneous_initial():
-    result = reduce.ci(lambda acc, x: acc + [x], cast(list[int], []), [1, 2, 3])
-    assert result == [1, 2, 3]
+def test_c_with_initial_empty_sequence():
+    assert reduce.c(lambda a, b: a + b, [], 99) == 99  # pyright: ignore[reportOperatorIssue, reportUnknownLambdaType]
+
+def test_c_with_heterogeneous_initial():
+    fn = reduce.c(lambda acc, x: acc + [x * 2])
+    assert fn([1, 2, 3], cast(list[int], [])) == [2, 4, 6]
+

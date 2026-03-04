@@ -113,26 +113,29 @@ def test_no_initial_uses_first_element_as_acc():
 
 def test_c_partial_func_then_iterable():
     fn = takewhile_acc.c(under(10))
-    assert fn([1, 2, 3, 4, 5], 0) == [1, 2, 3]
+    assert fn([1, 2, 3, 4, 5]) == [2, 3]  # no initial: first elem (1) used as acc; 1+2=3, 3+3=6, 6+4=10 fails
 
 def test_c_fully_applied():
-    assert takewhile_acc.c(under(10), [1, 2, 3, 4, 5], 0) == [1, 2, 3]
+    assert takewhile_acc.c(under(10), [1, 2, 3, 4, 5]) == [2, 3]  # no initial
 
 def test_c_with_take_first_negative():
     fn = takewhile_acc.c(under(10))
+    assert fn([1, 2, 3, 4, 5], take_first_negative=True) == [2, 3, 4]  # no initial; fails on 4 (sum=10)
+
+
+# ── takewhile_acc.c with initial (new: _call exposes initial param) ───────────
+
+def test_c_with_initial_two_step():
+    fn = takewhile_acc.c(under(10))
+    assert fn([1, 2, 3, 4, 5], 0) == [1, 2, 3]
+
+def test_c_with_initial_fully_applied():
+    assert takewhile_acc.c(under(10), [1, 2, 3, 4, 5], 0) == [1, 2, 3]
+
+def test_c_with_initial_and_take_first_negative():
+    fn = takewhile_acc.c(under(10))
     assert fn([1, 2, 3, 4, 5], 0, take_first_negative=True) == [1, 2, 3, 4]
 
+def test_c_with_initial_empty_iterable():
+    assert takewhile_acc.c(under(10), [], 0) == []
 
-# ── takewhile_acc.ci ──────────────────────────────────────────────────────────
-
-def test_ci_partial_step_by_step():
-    step1 = takewhile_acc.ci(under(10))
-    step2 = step1(0)
-    assert step2([1, 2, 3, 4, 5]) == [1, 2, 3]
-
-def test_ci_fully_applied():
-    assert takewhile_acc.ci(under(10), 0, [1, 2, 3, 4, 5]) == [1, 2, 3]
-
-def test_ci_with_take_first_negative():
-    result = takewhile_acc.ci(under(10), 0, [1, 2, 3, 4, 5], True)
-    assert result == [1, 2, 3, 4]

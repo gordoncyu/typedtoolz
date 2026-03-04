@@ -41,13 +41,13 @@ class _takewhile_acc_meta(type):
             *,
             take_first_negative: bool = False,
             ) -> list[T]:
-        return cls._call(func, initial, iterable, take_first_negative)
+        return cls._call(func, iterable, initial, take_first_negative=take_first_negative)
 
     @staticmethod
-    def _call(
+    def _call( # Because you cannot specify which version of an overriden function to pass
         func: Callable[[A, T], tuple[bool, A] | TakeAcc[A]],
-        initial: A,
         iterable: Iterable[T],
+        initial: A = cast(A, _initial_missing),  # pyright: ignore[reportCallInDefaultInitializer]
         take_first_negative: bool = False,
     ) -> list[T]:
         it = iter(iterable)
@@ -94,8 +94,7 @@ class _takewhile_acc(metaclass=_takewhile_acc_meta):  # See: https://github.com/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _takewhile_acc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    ci = curryv(3, _takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curryv(2, _takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 takewhile_acc = _takewhile_acc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
