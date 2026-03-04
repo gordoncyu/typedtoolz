@@ -1,4 +1,3 @@
-# USES ANY
 from typing import Callable, TypeVar, TypeVarTuple, Unpack, overload
 
 A = TypeVar('A', contravariant=True)
