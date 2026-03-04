@@ -29,7 +29,6 @@ class _reduce_meta(type):
             ) -> R: ...
 
     @staticmethod
-    @override
     def _reduce( # Because you can't pick a specific override to pass to a function this is a copy of the below
             function: Callable[[A | R, A], R],
             sequence: Iterable[A], 
