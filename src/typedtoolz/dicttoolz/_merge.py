@@ -11,9 +11,9 @@ W = TypeVar('W')
 
 
 class _merge_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, *dicts: Mapping[K, V]) -> dict[K, V]:
+    def __call__(*dicts: Mapping[K, V]) -> dict[K, V]:
         return _merge(*dicts)
 
 
@@ -29,9 +29,9 @@ merge = _merge  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/do
 
 
 class _merge_with_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[list[V]], W], *dicts: Mapping[K, V]) -> dict[K, W]:
+    def __call__(func: Callable[[list[V]], W], *dicts: Mapping[K, V]) -> dict[K, W]:
         return _merge_with(func, *dicts)
 
 

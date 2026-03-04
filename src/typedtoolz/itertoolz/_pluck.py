@@ -14,21 +14,21 @@ _missing = object()
 
 
 class _pluck_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, ind: int, seqs: Iterable[Sequence[T]]) -> Iterator[T]: ...
-    @classmethod
+    def __call__(ind: int, seqs: Iterable[Sequence[T]]) -> Iterator[T]: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: int, seqs: Iterable[Sequence[T]], default: D) -> Iterator[T | D]: ...
-    @classmethod
+    def __call__(ind: int, seqs: Iterable[Sequence[T]], default: D) -> Iterator[T | D]: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: K, seqs: Iterable[Mapping[K, V]]) -> Iterator[V]: ...
-    @classmethod
+    def __call__(ind: K, seqs: Iterable[Mapping[K, V]]) -> Iterator[V]: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: K, seqs: Iterable[Mapping[K, V]], default: D) -> Iterator[V | D]: ...
-    @classmethod
+    def __call__(ind: K, seqs: Iterable[Mapping[K, V]], default: D) -> Iterator[V | D]: ...
+    @staticmethod
     @override
-    def __call__(cls, ind: int | K, seqs: Iterable[Sequence[T]] | Iterable[Mapping[K, V]], default: D = cast(D, _missing)) -> Iterator[T | V | D]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(ind: int | K, seqs: Iterable[Sequence[T]] | Iterable[Mapping[K, V]], default: D = cast(D, _missing)) -> Iterator[T | V | D]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if default is _missing:
             return _pluck(ind, seqs)  # type: ignore[arg-type, return-value]
         return _pluck(ind, seqs, default)  # type: ignore[arg-type, return-value]

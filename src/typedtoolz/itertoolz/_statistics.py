@@ -11,9 +11,9 @@ _missing = object()
 
 
 class _random_sample_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, prob: float, seq: Iterable[T], random_state: int | None = cast(int | None, _missing)) -> Iterator[T]:  # pyright: ignore[reportCallInDefaultInitializer]
+    def __call__(prob: float, seq: Iterable[T], random_state: int | None = cast(int | None, _missing)) -> Iterator[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if random_state is _missing:
             return _random_sample(prob, seq)
         return _random_sample(prob, seq, random_state)  # type: ignore[arg-type]

@@ -14,9 +14,9 @@ _missing = object()
 
 
 class _groupby_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, key: Callable[[T], K], seq: Iterable[T]) -> dict[K, list[T]]:
+    def __call__(key: Callable[[T], K], seq: Iterable[T]) -> dict[K, list[T]]:
         return _groupby(key, seq)
 
 
@@ -35,15 +35,15 @@ groupby = _groupby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/mai
 
 
 class _reduceby_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, key: Callable[[T], K], binop: Callable[[T, T], T], seq: Iterable[T]) -> dict[K, T]: ...
-    @classmethod
+    def __call__(key: Callable[[T], K], binop: Callable[[T, T], T], seq: Iterable[T]) -> dict[K, T]: ...
+    @staticmethod
     @overload
-    def __call__(cls, key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = ...) -> dict[K, A]: ...
-    @classmethod
+    def __call__(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = ...) -> dict[K, A]: ...
+    @staticmethod
     @override
-    def __call__(cls, key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = cast(Callable[[], A] | A, _missing)) -> dict[K, A]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = cast(Callable[[], A] | A, _missing)) -> dict[K, A]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if init is _missing:
             return _reduceby(key, binop, seq)  # type: ignore[return-value, arg-type]
         return _reduceby(key, binop, seq, init)  # type: ignore[arg-type]
@@ -64,9 +64,9 @@ reduceby = _reduceby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/m
 
 
 class _frequencies_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> dict[T, int]:
+    def __call__(seq: Iterable[T]) -> dict[T, int]:
         return _frequencies(seq)
 
 
@@ -82,9 +82,9 @@ frequencies = _frequencies  # why? See: https://github.com/gordoncyu/typedtoolz/
 
 
 class _countby_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, key: Callable[[T], K], seq: Iterable[T]) -> dict[K, int]:
+    def __call__(key: Callable[[T], K], seq: Iterable[T]) -> dict[K, int]:
         return _countby(key, seq)
 
 

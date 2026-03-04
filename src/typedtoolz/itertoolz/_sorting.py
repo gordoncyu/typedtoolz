@@ -11,9 +11,9 @@ _missing = object()
 
 
 class _merge_sorted_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, *seqs: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> Iterable[T]:  # pyright: ignore[reportCallInDefaultInitializer]
+    def __call__(*seqs: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> Iterable[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
             return _merge_sorted(*seqs)
         return _merge_sorted(*seqs, key=key)  # type: ignore[arg-type]
@@ -31,9 +31,9 @@ merge_sorted = _merge_sorted  # why? See: https://github.com/gordoncyu/typedtool
 
 
 class _topk_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, k: int, seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> list[T]:  # pyright: ignore[reportCallInDefaultInitializer]
+    def __call__(k: int, seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> list[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
             return _topk(k, seq)
         return _topk(k, seq, key=key)  # type: ignore[arg-type]

@@ -14,15 +14,15 @@ _missing = object()
 
 
 class _valfilter_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[V], object], d: Mapping[K, V]) -> dict[K, V]: ...
-    @classmethod
+    def __call__(predicate: Callable[[V], object], d: Mapping[K, V]) -> dict[K, V]: ...
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _valfilter(predicate, d)
         return _valfilter(predicate, d, factory)  # type: ignore[arg-type]
@@ -43,15 +43,15 @@ valfilter = _valfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 
 class _keyfilter_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[K], object], d: Mapping[K, V]) -> dict[K, V]: ...
-    @classmethod
+    def __call__(predicate: Callable[[K], object], d: Mapping[K, V]) -> dict[K, V]: ...
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _keyfilter(predicate, d)
         return _keyfilter(predicate, d, factory)  # type: ignore[arg-type]
@@ -72,15 +72,15 @@ keyfilter = _keyfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 
 class _itemfilter_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V]) -> dict[K, V]: ...
-    @classmethod
+    def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V]) -> dict[K, V]: ...
+    @staticmethod
     @overload
-    def __call__(cls, predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _itemfilter(predicate, d)
         return _itemfilter(predicate, d, factory)  # type: ignore[arg-type]

@@ -9,9 +9,9 @@ T = TypeVar('T')
 
 
 class _partitionby_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[T], object], seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
+    def __call__(func: Callable[[T], object], seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
         return _partitionby(func, seq)
 
 

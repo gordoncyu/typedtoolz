@@ -14,9 +14,9 @@ _missing = object()
 
 
 class _unique_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> Iterator[T]:  # pyright: ignore[reportCallInDefaultInitializer]
+    def __call__(seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> Iterator[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
             return _unique(seq)
         return _unique(seq, key=key)  # type: ignore[arg-type]
@@ -34,9 +34,9 @@ unique = _unique  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _diff_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, *seqs: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing), default: T = cast(T, _missing)) -> Iterator[tuple[T, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
+    def __call__(*seqs: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing), default: T = cast(T, _missing)) -> Iterator[tuple[T, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
         kwargs: dict[str, object] = {}
         if key is not _missing:
             kwargs['key'] = key
@@ -57,10 +57,9 @@ diff = _diff  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _join_meta(type):
-    @classmethod
+    @staticmethod
     @override
     def __call__(
-        cls,
         leftkey: Callable[[L], K],
         leftseq: Iterable[L],
         rightkey: Callable[[R], K],

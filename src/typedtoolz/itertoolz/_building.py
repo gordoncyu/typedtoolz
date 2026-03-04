@@ -17,9 +17,9 @@ _missing = object()
 
 
 class _remove_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, predicate: Callable[[T], object], seq: Iterable[T]) -> Iterator[T]:
+    def __call__(predicate: Callable[[T], object], seq: Iterable[T]) -> Iterator[T]:
         return _remove(predicate, seq)
 
 
@@ -38,15 +38,15 @@ remove = _remove  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _accumulate_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, binop: Callable[[T, T], T], seq: Iterable[T]) -> Iterator[T]: ...
-    @classmethod
+    def __call__(binop: Callable[[T, T], T], seq: Iterable[T]) -> Iterator[T]: ...
+    @staticmethod
     @overload
-    def __call__(cls, binop: Callable[[A, T], A], seq: Iterable[T], initial: A) -> Iterator[A]: ...
-    @classmethod
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A) -> Iterator[A]: ...
+    @staticmethod
     @override
-    def __call__(cls, binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, _missing)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, _missing)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if initial is _missing:
             return _accumulate(binop, seq)  # type: ignore[arg-type, return-value]
         return _accumulate(binop, seq, initial)  # type: ignore[arg-type]
@@ -67,9 +67,9 @@ accumulate = _accumulate  # why? See: https://github.com/gordoncyu/typedtoolz/bl
 
 
 class _cons_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, el: T, seq: Iterable[T]) -> Iterator[T]:
+    def __call__(el: T, seq: Iterable[T]) -> Iterator[T]:
         return _cons(el, seq)
 
 
@@ -88,9 +88,9 @@ cons = _cons  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _interpose_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, el: T, seq: Iterable[T]) -> Iterator[T]:
+    def __call__(el: T, seq: Iterable[T]) -> Iterator[T]:
         return _interpose(el, seq)
 
 
@@ -109,9 +109,9 @@ interpose = _interpose  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 
 class _interleave_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seqs: Iterable[Iterable[T]]) -> Iterable[T]:
+    def __call__(seqs: Iterable[Iterable[T]]) -> Iterable[T]:
         return _interleave(seqs)
 
 
@@ -127,9 +127,9 @@ interleave = _interleave  # why? See: https://github.com/gordoncyu/typedtoolz/bl
 
 
 class _iterate_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[T], T], x: T) -> Iterator[T]:
+    def __call__(func: Callable[[T], T], x: T) -> Iterator[T]:
         return _iterate(func, x)
 
 
@@ -148,9 +148,9 @@ iterate = _iterate  # why? See: https://github.com/gordoncyu/typedtoolz/blob/mai
 
 
 class _concat_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seqs: Iterable[Iterable[T]]) -> Iterator[T]:
+    def __call__(seqs: Iterable[Iterable[T]]) -> Iterator[T]:
         return _concat(seqs)
 
 
@@ -166,9 +166,9 @@ concat = _concat  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _concatv_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, *seqs: Iterable[T]) -> Iterator[T]:
+    def __call__(*seqs: Iterable[T]) -> Iterator[T]:
         return _concatv(*seqs)
 
 
@@ -184,9 +184,9 @@ concatv = _concatv  # why? See: https://github.com/gordoncyu/typedtoolz/blob/mai
 
 
 class _mapcat_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[T], Iterable[R]], seqs: Iterable[T]) -> Iterator[R]:
+    def __call__(func: Callable[[T], Iterable[R]], seqs: Iterable[T]) -> Iterator[R]:
         return _mapcat(func, seqs)
 
 

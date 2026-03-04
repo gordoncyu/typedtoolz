@@ -14,27 +14,27 @@ _missing = object()
 
 
 class _get_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, ind: int, seq: Sequence[T]) -> T: ...
-    @classmethod
+    def __call__(ind: int, seq: Sequence[T]) -> T: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: int, seq: Sequence[T], default: D) -> T | D: ...
-    @classmethod
+    def __call__(ind: int, seq: Sequence[T], default: D) -> T | D: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: list[int], seq: Sequence[T]) -> list[T]: ...
-    @classmethod
+    def __call__(ind: list[int], seq: Sequence[T]) -> list[T]: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: list[int], seq: Sequence[T], default: D) -> list[T | D]: ...
-    @classmethod
+    def __call__(ind: list[int], seq: Sequence[T], default: D) -> list[T | D]: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: K, seq: Mapping[K, V]) -> V: ...
-    @classmethod
+    def __call__(ind: K, seq: Mapping[K, V]) -> V: ...
+    @staticmethod
     @overload
-    def __call__(cls, ind: K, seq: Mapping[K, V], default: D) -> V | D: ...
-    @classmethod
+    def __call__(ind: K, seq: Mapping[K, V], default: D) -> V | D: ...
+    @staticmethod
     @override
-    def __call__(cls, ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, _missing)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, _missing)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if default is _missing:
             return _get(ind, seq)  # type: ignore[arg-type, return-value]
         return _get(ind, seq, default)  # type: ignore[arg-type, return-value]

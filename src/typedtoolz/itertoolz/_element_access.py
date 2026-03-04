@@ -20,42 +20,42 @@ Ts = TypeVarTuple('Ts')
 
 
 class _nth_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[0], seq: tuple[A1, *Ts]) -> A1: ...
-    @classmethod
+    def __call__(n: Literal[0], seq: tuple[A1, *Ts]) -> A1: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[1], seq: tuple[A1, A2, *Ts]) -> A2: ...
-    @classmethod
+    def __call__(n: Literal[1], seq: tuple[A1, A2, *Ts]) -> A2: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[2], seq: tuple[A1, A2, A3, *Ts]) -> A3: ...
-    @classmethod
+    def __call__(n: Literal[2], seq: tuple[A1, A2, A3, *Ts]) -> A3: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[3], seq: tuple[A1, A2, A3, A4, *Ts]) -> A4: ...
-    @classmethod
+    def __call__(n: Literal[3], seq: tuple[A1, A2, A3, A4, *Ts]) -> A4: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[4], seq: tuple[A1, A2, A3, A4, A5, *Ts]) -> A5: ...
-    @classmethod
+    def __call__(n: Literal[4], seq: tuple[A1, A2, A3, A4, A5, *Ts]) -> A5: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[5], seq: tuple[A1, A2, A3, A4, A5, A6, *Ts]) -> A6: ...
-    @classmethod
+    def __call__(n: Literal[5], seq: tuple[A1, A2, A3, A4, A5, A6, *Ts]) -> A6: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[6], seq: tuple[A1, A2, A3, A4, A5, A6, A7, *Ts]) -> A7: ...
-    @classmethod
+    def __call__(n: Literal[6], seq: tuple[A1, A2, A3, A4, A5, A6, A7, *Ts]) -> A7: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[7], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, *Ts]) -> A8: ...
-    @classmethod
+    def __call__(n: Literal[7], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, *Ts]) -> A8: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[8], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9, *Ts]) -> A9: ...
-    @classmethod
+    def __call__(n: Literal[8], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9, *Ts]) -> A9: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: Literal[9], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts]) -> A10: ...
-    @classmethod
+    def __call__(n: Literal[9], seq: tuple[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts]) -> A10: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: int, seq: Iterable[T]) -> T: ...
-    @classmethod
+    def __call__(n: int, seq: Iterable[T]) -> T: ...
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
+    def __call__(n: int, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
         return _nth(n, seq)  # type: ignore[return-value]
 
 
@@ -74,15 +74,15 @@ nth = _nth  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/t
 
 
 class _first_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, seq: tuple[T, *Ts]) -> T: ...
-    @classmethod
+    def __call__(seq: tuple[T, *Ts]) -> T: ...
+    @staticmethod
     @overload
-    def __call__(cls, seq: Iterable[T]) -> T: ...
-    @classmethod
+    def __call__(seq: Iterable[T]) -> T: ...
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
+    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
         return _first(seq)
 
 
@@ -98,15 +98,15 @@ first = _first  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/do
 
 
 class _second_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, seq: tuple[A1, T, *Ts]) -> T: ...
-    @classmethod
+    def __call__(seq: tuple[A1, T, *Ts]) -> T: ...
+    @staticmethod
     @overload
-    def __call__(cls, seq: Iterable[T]) -> T: ...
-    @classmethod
+    def __call__(seq: Iterable[T]) -> T: ...
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
+    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
         return _second(seq)
 
 
@@ -122,15 +122,15 @@ second = _second  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _last_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, seq: tuple[*Ts, T]) -> T: ...
-    @classmethod
+    def __call__(seq: tuple[*Ts, T]) -> T: ...
+    @staticmethod
     @overload
-    def __call__(cls, seq: Iterable[T]) -> T: ...
-    @classmethod
+    def __call__(seq: Iterable[T]) -> T: ...
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
+    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
         return _last(seq)
 
 
@@ -146,9 +146,9 @@ last = _last  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _rest_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> Iterator[T]:
+    def __call__(seq: Iterable[T]) -> Iterator[T]:
         return _rest(seq)
 
 
@@ -164,9 +164,9 @@ rest = _rest  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _peek_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, seq: Iterable[T]) -> tuple[T, Iterator[T]]:
+    def __call__(seq: Iterable[T]) -> tuple[T, Iterator[T]]:
         return _peek(seq)
 
 
@@ -182,9 +182,9 @@ peek = _peek  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _peekn_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> tuple[list[T], Iterator[T]]:
+    def __call__(n: int, seq: Iterable[T]) -> tuple[list[T], Iterator[T]]:
         return _peekn(n, seq)
 
 

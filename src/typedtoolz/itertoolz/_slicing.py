@@ -9,9 +9,9 @@ T = TypeVar('T')
 
 
 class _take_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> list[T]:
+    def __call__(n: int, seq: Iterable[T]) -> list[T]:
         return _take(n, seq)
 
 
@@ -30,9 +30,9 @@ take = _take  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _tail_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> list[T]:
+    def __call__(n: int, seq: Iterable[T]) -> list[T]:
         return _tail(n, seq)
 
 
@@ -51,9 +51,9 @@ tail = _tail  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _drop_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> Iterator[T]:
+    def __call__(n: int, seq: Iterable[T]) -> Iterator[T]:
         return _drop(n, seq)
 
 
@@ -72,9 +72,9 @@ drop = _drop  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs
 
 
 class _take_nth_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> Iterator[T]:
+    def __call__(n: int, seq: Iterable[T]) -> Iterator[T]:
         return _take_nth(n, seq)
 
 

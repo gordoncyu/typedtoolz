@@ -14,10 +14,9 @@ _missing = object()
 
 
 class _fold_meta(type):
-    @classmethod
+    @staticmethod
     @overload
     def __call__(
-        cls,
         binop: Callable[[T, T], T],
         seq: Iterable[T],
         *,
@@ -25,10 +24,9 @@ class _fold_meta(type):
         chunksize: int = ...,
         combine: Callable[[T, T], T] | None = ...,
     ) -> T: ...
-    @classmethod
+    @staticmethod
     @overload
     def __call__(
-        cls,
         binop: Callable[[A, T], A],
         seq: Iterable[T],
         default: A,
@@ -36,9 +34,9 @@ class _fold_meta(type):
         chunksize: int = ...,
         combine: Callable[[A, A], A] | None = ...,
     ) -> A: ...
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, binop: Callable[[A, T], A], seq: Iterable[T], default: A = cast(A, _missing), **kwargs: object) -> A:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], default: A = cast(A, _missing), **kwargs: object) -> A:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if default is _missing:
             return _fold(binop, seq, **kwargs)  # type: ignore[arg-type, return-value]
         return _fold(binop, seq, default, **kwargs)  # type: ignore[arg-type]

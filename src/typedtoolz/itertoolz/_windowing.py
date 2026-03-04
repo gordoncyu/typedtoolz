@@ -12,9 +12,9 @@ _missing = object()
 
 
 class _sliding_window_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
+    def __call__(n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
         return _sliding_window(n, seq)
 
 
@@ -33,15 +33,15 @@ sliding_window = _sliding_window  # why? See: https://github.com/gordoncyu/typed
 
 
 class _partition_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]: ...
-    @classmethod
+    def __call__(n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]: ...
+    @staticmethod
     @overload
-    def __call__(cls, n: int, seq: Iterable[T], pad: D) -> Iterator[tuple[T | D, ...]]: ...
-    @classmethod
+    def __call__(n: int, seq: Iterable[T], pad: D) -> Iterator[tuple[T | D, ...]]: ...
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if pad is _missing:
             return _partition(n, seq)
         return _partition(n, seq, pad)  # type: ignore[arg-type]
@@ -62,9 +62,9 @@ partition = _partition  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 
 class _partition_all_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
+    def __call__(n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
         return _partition_all(n, seq)
 
 

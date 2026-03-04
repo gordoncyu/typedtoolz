@@ -14,9 +14,9 @@ _missing = object()
 
 
 class _assoc_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, d: Mapping[K, V], key: K, value: V) -> dict[K, V]:
+    def __call__(d: Mapping[K, V], key: K, value: V) -> dict[K, V]:
         return _assoc(d, key, value)
 
 
@@ -35,9 +35,9 @@ assoc = _assoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/do
 
 
 class _dissoc_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, d: Mapping[K, V], *keys: K) -> dict[K, V]:
+    def __call__(d: Mapping[K, V], *keys: K) -> dict[K, V]:
         return _dissoc(d, *keys)
 
 
@@ -56,9 +56,9 @@ dissoc = _dissoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _assoc_in_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, d: Mapping[object, Any], keys: Iterable[object], value: object) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
         return _assoc_in(d, keys, value)
 
 
@@ -77,9 +77,9 @@ assoc_in = _assoc_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/m
 
 
 class _update_in_meta(type):
-    @classmethod
+    @staticmethod
     @override
-    def __call__(cls, d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = cast(object, _missing)) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = cast(object, _missing)) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
         if default is _missing:
             return _update_in(d, keys, func)
         return _update_in(d, keys, func, default)
@@ -100,15 +100,15 @@ update_in = _update_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 
 class _get_in_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], *, no_default: bool = ...) -> Any: ...  # pyright: ignore[reportExplicitAny]
-    @classmethod
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], *, no_default: bool = ...) -> Any: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
     @overload
-    def __call__(cls, keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D, no_default: bool = ...) -> Any | D: ...  # pyright: ignore[reportExplicitAny]
-    @classmethod
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D, no_default: bool = ...) -> Any | D: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
     @override
-    def __call__(cls, keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = cast(D, _missing), no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = cast(D, _missing), no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer, reportInconsistentOverload]
         if default is _missing:
             return _get_in(keys, coll, no_default=no_default)
         return _get_in(keys, coll, default, no_default=no_default)  # type: ignore[arg-type]

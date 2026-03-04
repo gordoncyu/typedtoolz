@@ -16,15 +16,15 @@ _missing = object()
 
 
 class _valmap_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[V], W], d: Mapping[K, V]) -> dict[K, W]: ...
-    @classmethod
+    def __call__(func: Callable[[V], W], d: Mapping[K, V]) -> dict[K, W]: ...
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _valmap(func, d)
         return _valmap(func, d, factory)  # type: ignore[arg-type]
@@ -45,15 +45,15 @@ valmap = _valmap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _keymap_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[K], J], d: Mapping[K, V]) -> dict[J, V]: ...
-    @classmethod
+    def __call__(func: Callable[[K], J], d: Mapping[K, V]) -> dict[J, V]: ...
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _keymap(func, d)
         return _keymap(func, d, factory)  # type: ignore[arg-type]
@@ -74,15 +74,15 @@ keymap = _keymap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 
 class _itemmap_meta(type):
-    @classmethod
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V]) -> dict[J, W]: ...
-    @classmethod
+    def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V]) -> dict[J, W]: ...
+    @staticmethod
     @overload
-    def __call__(cls, func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
-    @classmethod
+    def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(cls, func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if factory is _missing:
             return _itemmap(func, d)
         return _itemmap(func, d, factory)  # type: ignore[arg-type]
