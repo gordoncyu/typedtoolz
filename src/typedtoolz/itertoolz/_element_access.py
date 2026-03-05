@@ -57,6 +57,10 @@ class _nth_meta(type):
     def __call__(n: int, seq: Iterable[T]) -> T:
         return cynth(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call(n: int, seq: Iterable[T]) -> T:
+        return cynth(n, seq)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _nth(metaclass=_nth_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -66,7 +70,7 @@ class _nth(metaclass=_nth_meta):  # See: https://github.com/gordoncyu/typedtoolz
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _nth_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2, _nth_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 nth = _nth  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

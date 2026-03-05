@@ -49,9 +49,8 @@ class _reduceby_meta(type):
             return cyreduceby(key, binop, seq)  # pyright: ignore[reportUnknownVariableType]
         return cyreduceby(key, binop, seq, init)  # pyright: ignore[reportUnknownVariableType]
     @staticmethod
-    def _reduceby(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = cast(Callable[[], A] | A, _missing)) -> dict[K, A]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if init is _missing:
-            return cyreduceby(key, binop, seq)  # pyright: ignore[reportUnknownVariableType]
+
+    def _call_default(key: Callable[[T], K], init: Callable[[], A] | A, binop: Callable[[A, T], A], seq: Iterable[T]) -> dict[K, A]:
         return cyreduceby(key, binop, seq, init)  # pyright: ignore[reportUnknownVariableType]
 
 
@@ -63,7 +62,8 @@ class _reduceby(metaclass=_reduceby_meta):  # See: https://github.com/gordoncyu/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(3, _reduceby_meta._reduceby)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(3, _reduceby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    ci = curry(4, _reduceby_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 reduceby = _reduceby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

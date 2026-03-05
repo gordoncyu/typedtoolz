@@ -3,7 +3,6 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.itertoolz import sliding_window as cysliding_window, partition as cypartition, partition_all as cypartition_all  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
-from typedtoolz.functoolz._curryv import curryv
 
 T = TypeVar('T')
 D = TypeVar('D')
@@ -46,9 +45,7 @@ class _partition_meta(type):
             return cypartition(n, seq)  # pyright: ignore[reportUnknownVariableType]
         return cypartition(n, seq, pad)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
     @staticmethod
-    def _partition(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if pad is _missing:
-            return cypartition(n, seq)  # pyright: ignore[reportUnknownVariableType]
+    def _call_pad(pad: D, n: int, seq: Iterable[T]) -> Iterator[tuple[T | D, ...]]:
         return cypartition(n, seq, pad)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
@@ -60,7 +57,8 @@ class _partition(metaclass=_partition_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _partition_meta._partition)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2, _partition_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cp = curry(3, _partition_meta._call_pad)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 partition = _partition  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

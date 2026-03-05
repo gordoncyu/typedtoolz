@@ -35,7 +35,11 @@ class _topk_meta(type):
     def __call__(k: int, seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> list[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
             return cytopk(k, seq)  # pyright: ignore[reportUnknownVariableType]
-        return cytopk(k, seq, key=key)  # pyright: ignore[reportUnknownVariableType]
+        return cytopk(k, seq, key)  # pyright: ignore[reportUnknownVariableType]
+
+    @staticmethod
+    def _call_key(key: Callable[[T], object], k: int, seq: Iterable[T]) -> list[T]:
+        return cytopk(k, seq, key)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _topk(metaclass=_topk_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -47,6 +51,7 @@ class _topk(metaclass=_topk_meta):  # See: https://github.com/gordoncyu/typedtoo
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _topk_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    ck = curry(3, _topk_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 topk = _topk  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

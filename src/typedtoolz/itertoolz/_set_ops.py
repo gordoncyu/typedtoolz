@@ -21,6 +21,10 @@ class _unique_meta(type):
             return cyunique(seq)  # pyright: ignore[reportUnknownVariableType]
         return cyunique(seq, key=key)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_key(key: Callable[[T], object], seq: Iterable[T]) -> Iterator[T]:
+        return cyunique(seq, key)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
+
 
 class _unique(metaclass=_unique_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -28,7 +32,8 @@ class _unique(metaclass=_unique_meta):  # See: https://github.com/gordoncyu/type
 
     Return only unique elements of a sequence.
     """
-    c = curryv(1, _unique_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(1, _unique_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    ck = curry(2, _unique_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 unique = _unique  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
@@ -78,6 +83,34 @@ class _join_meta(type):
             kwargs['right_default'] = right_default
         return cyjoin(leftkey, leftseq, rightkey, rightseq, **kwargs)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_left_default(
+        leftkey: Callable[[L], K],
+        rightkey: Callable[[R], K],
+        left_default: L,
+        leftseq: Iterable[L],
+        rightseq: Iterable[R],
+    ) -> Iterator[tuple[L, R]]:
+        return cyjoin(leftkey, leftseq, rightkey, rightseq, left_default)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_right_default(
+        leftkey: Callable[[L], K],
+        rightkey: Callable[[R], K],
+        right_default: R,
+        leftseq: Iterable[L],
+        rightseq: Iterable[R],
+    ) -> Iterator[tuple[L, R]]:
+        return cyjoin(leftkey, leftseq, rightkey, rightseq, right_default=right_default)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_default(
+        leftkey: Callable[[L], K],
+        rightkey: Callable[[R], K],
+        left_default: L,
+        right_default: R,
+        leftseq: Iterable[L],
+        rightseq: Iterable[R],
+    ) -> Iterator[tuple[L, R]]:
+        return cyjoin(leftkey, leftseq, rightkey, rightseq, left_default, right_default)  # pyright: ignore[reportUnknownVariableType]
 
 class _join(metaclass=_join_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -88,6 +121,9 @@ class _join(metaclass=_join_meta):  # See: https://github.com/gordoncyu/typedtoo
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(4, _join_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(6, _join_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cld = curry(5, _join_meta._call_left_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    crd = curry(5, _join_meta._call_right_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 join = _join  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

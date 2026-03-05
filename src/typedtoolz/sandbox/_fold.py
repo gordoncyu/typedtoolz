@@ -3,6 +3,7 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from toolz.sandbox.parallel import fold as tz_fold  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 
 T = TypeVar('T')
 A = TypeVar('A')
@@ -40,6 +41,43 @@ class _fold_meta(type):
             return tz_fold(binop, seq, **kwargs)  # pyright: ignore[reportUnknownVariableType, reportArgumentType]
         return tz_fold(binop, seq, default, **kwargs)  # pyright: ignore[reportArgumentType, reportUnknownVariableType]
 
+    @staticmethod
+    def _call(
+        binop: Callable[[T, T], T],
+        seq: Iterable[T],
+        map: Callable[[Callable[[B], C], Iterable[B]], Iterable[C]] = map,
+        chunksize: int = 128
+    ) -> T:
+        return tz_fold(binop, seq, map=map, chunksize=chunksize)  # pyright: ignore[reportReturnType, reportUnknownVariableType, reportArgumentType]
+    @staticmethod
+    def _call_default(
+        binop: Callable[[A, T], A],
+        default: A,
+        seq: Iterable[T],
+        map: Callable[[Callable[[B], C], Iterable[B]], Iterable[C]] = map,
+        chunksize: int = 128,
+    ) -> A:
+        return tz_fold(binop, seq, default, map, chunksize, None)  # pyright: ignore[reportReturnType, reportUnknownVariableType, reportArgumentType]
+    @staticmethod
+    def _call_combine(
+        binop: Callable[[T, T], T],
+        combine: Callable[[T, T], T] | None,
+        seq: Iterable[T],
+        map: Callable[[Callable[[B], C], Iterable[B]], Iterable[C]] = map,
+        chunksize: int = 128,
+    ) -> T:
+        return tz_fold(binop, seq, map=map, chunksize=chunksize, combine=combine)  # pyright: ignore[reportReturnType, reportUnknownVariableType, reportArgumentType]
+    @staticmethod
+    def _call_combine_default(
+        binop: Callable[[A, T], A],
+        combine: Callable[[A, A], A] | None,
+        default: A,
+        seq: Iterable[T],
+        map: Callable[[Callable[[B], C], Iterable[B]], Iterable[C]] = map,
+        chunksize: int = 128,
+    ) -> A:
+        return tz_fold(binop, seq, default, map, chunksize, combine)  # pyright: ignore[reportReturnType, reportUnknownVariableType, reportArgumentType]
+
 
 class _fold(metaclass=_fold_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -49,7 +87,10 @@ class _fold(metaclass=_fold_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _fold_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2, _fold_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cd = curryv(3, _fold_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cc = curryv(3, _fold_meta._call_combine)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    ccd = curryv(4, _fold_meta._call_combine_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 fold = _fold  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

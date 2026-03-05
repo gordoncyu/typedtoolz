@@ -25,6 +25,9 @@ class _valfilter_meta(type):
             return cyvalfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
         return cyvalfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], predicate: Callable[[V], object], d: Mapping[object, V]) -> F:
+        return cyvalfilter(predicate, d, factory)  # pyright: ignore[reportUnknownVariableType]
 
 class _valfilter(metaclass=_valfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -35,6 +38,7 @@ class _valfilter(metaclass=_valfilter_meta):  # See: https://github.com/gordoncy
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _valfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(3, _valfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage, reportUnannotatedClassAttribute]
 
 
 valfilter = _valfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -54,6 +58,10 @@ class _keyfilter_meta(type):
             return cykeyfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
         return cykeyfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], predicate: Callable[[K], object], d: Mapping[K, object]) -> F:
+        return cykeyfilter(predicate, d, factory)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _keyfilter(metaclass=_keyfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -64,6 +72,7 @@ class _keyfilter(metaclass=_keyfilter_meta):  # See: https://github.com/gordoncy
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _keyfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3, _keyfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
 
 
 keyfilter = _keyfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -83,6 +92,10 @@ class _itemfilter_meta(type):
             return cyitemfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
         return cyitemfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V]) -> F:
+        return cyitemfilter(predicate, d, factory)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _itemfilter(metaclass=_itemfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -93,6 +106,7 @@ class _itemfilter(metaclass=_itemfilter_meta):  # See: https://github.com/gordon
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _itemfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3, _itemfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
 
 
 itemfilter = _itemfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

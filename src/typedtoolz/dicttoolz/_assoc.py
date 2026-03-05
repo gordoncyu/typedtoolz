@@ -99,18 +99,19 @@ update_in = _update_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 
 class _get_in_meta(type):
     @staticmethod
-    @overload
-    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], *, no_default: bool = ...) -> Any: ...  # pyright: ignore[reportExplicitAny, reportAny]
-    @staticmethod
-    @overload
-    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D, no_default: bool = ...) -> Any | D: ...  # pyright: ignore[reportExplicitAny]
-    @staticmethod
     @override
-    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = cast(D, _missing), no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = None, no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny]
         if default is _missing:
             return cyget_in(keys, coll, no_default=no_default)  # pyright: ignore[reportUnknownVariableType]
         return cyget_in(keys, coll, default, no_default=no_default)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any]) -> Any | D:  # pyright: ignore[reportExplicitAny]
+        return cyget_in(keys, coll, no_default=True)  # pyright: ignore[reportUnknownVariableType]
+
+    @staticmethod
+    def _call_default(default: D, keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any]) -> Any | D:  # pyright: ignore[reportExplicitAny]
+        return cyget_in(keys, coll, default)  # pyright: ignore[reportUnknownVariableType]
 
 class _get_in(metaclass=_get_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -120,7 +121,8 @@ class _get_in(metaclass=_get_in_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _get_in_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2, _get_in_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage] # TODO: maybe make default c one not a foot gun (no default)
+    cd = curry(3, _get_in_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 get_in = _get_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

@@ -39,6 +39,24 @@ class _get_meta(type):
             return cyget(ind, seq)  # pyright: ignore[reportUnknownVariableType]
         return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_ind_default(default: D, ind: int, seq: Sequence[T]) -> T | D:
+        return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
+
+    @staticmethod
+    def _call_inds(ind: list[int], seq: Sequence[T]) -> list[T]:
+        return cyget(ind, seq)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_inds_default(default: D, ind: list[int], seq: Sequence[T]) -> list[T | D]:
+        return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
+
+    @staticmethod
+    def _call_mapping(ind: K, seq: Mapping[K, V]) -> V:
+        return cyget(ind, seq)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_mapping_default(default: D, ind: K, seq: Mapping[K, V]) -> V | D:
+        return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _get(metaclass=_get_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -49,6 +67,13 @@ class _get(metaclass=_get_meta):  # See: https://github.com/gordoncyu/typedtoolz
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _get_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(3, _get_meta._call_ind_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+
+    cs = curry(2, _get_meta._call_inds)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    csd = curry(3, _get_meta._call_inds_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+
+    cm = curry(2, _get_meta._call_mapping)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cmd = curry(3, _get_meta._call_mapping_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 get = _get  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

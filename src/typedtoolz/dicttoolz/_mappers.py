@@ -27,6 +27,9 @@ class _valmap_meta(type):
             return cyvalmap(func, d)  # pyright: ignore[reportUnknownVariableType]
         return cyvalmap(func, d, factory)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], func: Callable[[V], object], d: Mapping[object, V]) -> F:
+        return cyvalmap(func, d, factory)  # pyright: ignore[reportUnknownVariableType]
 
 class _valmap(metaclass=_valmap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -37,6 +40,7 @@ class _valmap(metaclass=_valmap_meta):  # See: https://github.com/gordoncyu/type
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _valmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3, _valmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 valmap = _valmap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -56,6 +60,9 @@ class _keymap_meta(type):
             return cykeymap(func, d)  # pyright: ignore[reportUnknownVariableType]
         return cykeymap(func, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], func: Callable[[K], object], d: Mapping[K, object]) -> F:
+        return cykeymap(func, d, factory)  # pyright: ignore[reportUnknownVariableType]
 
 class _keymap(metaclass=_keymap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -66,6 +73,7 @@ class _keymap(metaclass=_keymap_meta):  # See: https://github.com/gordoncyu/type
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _keymap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3, _keymap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 keymap = _keymap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -85,6 +93,10 @@ class _itemmap_meta(type):
             return cyitemmap(func, d)  # pyright: ignore[reportUnknownVariableType]
         return cyitemmap(func, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_factory(factory: Callable[[], F], func: Callable[[tuple[K, V]], tuple[object, object]], d: Mapping[K, V]) -> F:
+        return cyitemmap(func, d, factory)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _itemmap(metaclass=_itemmap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -95,6 +107,7 @@ class _itemmap(metaclass=_itemmap_meta):  # See: https://github.com/gordoncyu/ty
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _itemmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3, _itemmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 itemmap = _itemmap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

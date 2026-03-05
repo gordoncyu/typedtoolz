@@ -50,6 +50,10 @@ class _accumulate_meta(type):
             return cyaccumulate(binop, seq)  # type: ignore[arg-type, return-value]  # pyright: ignore[reportUnknownVariableType]
         return cyaccumulate(binop, seq, initial)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call_default(binop: Callable[[A, T], A], initial: A, seq: Iterable[T]) -> Iterator[A]:
+        return cyaccumulate(binop, seq, initial)  # pyright: ignore[reportUnknownVariableType]
+
 
 class _accumulate(metaclass=_accumulate_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -60,6 +64,7 @@ class _accumulate(metaclass=_accumulate_meta):  # See: https://github.com/gordon
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
     c = curry(2, _accumulate_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3, _accumulate_meta._call_default)  # pyright: ignore[reportPrivateUsage]
 
 
 accumulate = _accumulate  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
