@@ -1,8 +1,7 @@
-# TODO: Review msc impl
 from collections.abc import Iterable, Iterator
 from typing import TypeVar
 from typing_extensions import override
-from cytoolz.itertoolz import take as _take, tail as _tail, drop as _drop, take_nth as _take_nth
+from cytoolz.itertoolz import take as cytake, tail as cytail, drop as cydrop, take_nth as cytake_nth  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -12,7 +11,7 @@ class _take_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> list[T]:
-        return _take(n, seq)
+        return cytake(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _take(metaclass=_take_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -33,7 +32,7 @@ class _tail_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> list[T]:
-        return _tail(n, seq)
+        return cytail(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _tail(metaclass=_tail_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -54,7 +53,7 @@ class _drop_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> Iterator[T]:
-        return _drop(n, seq)
+        return cydrop(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _drop(metaclass=_drop_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -75,7 +74,7 @@ class _take_nth_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> Iterator[T]:
-        return _take_nth(n, seq)
+        return cytake_nth(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _take_nth(metaclass=_take_nth_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

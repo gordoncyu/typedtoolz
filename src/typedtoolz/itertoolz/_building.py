@@ -1,11 +1,10 @@
-# TODO: Review msc impl
 from collections.abc import Callable, Iterable, Iterator
 from typing import TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.itertoolz import (
-    remove as _remove, accumulate as _accumulate, cons as _cons,
-    interpose as _interpose, interleave as _interleave, iterate as _iterate,
-    concat as _concat, concatv as _concatv, mapcat as _mapcat,
+    remove as cyremove, accumulate as cyaccumulate, cons as cycons,  # pyright: ignore[reportUnknownVariableType]
+    interpose as cyinterpose, interleave as cyinterleave, iterate as cyiterate,  # pyright: ignore[reportUnknownVariableType]
+    concat as cyconcat, concatv as cyconcatv, mapcat as cymapcat,  # pyright: ignore[reportUnknownVariableType]
 )
 from typedtoolz.functoolz._curry import curry
 
@@ -20,7 +19,7 @@ class _remove_meta(type):
     @staticmethod
     @override
     def __call__(predicate: Callable[[T], object], seq: Iterable[T]) -> Iterator[T]:
-        return _remove(predicate, seq)
+        return cyremove(predicate, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _remove(metaclass=_remove_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -46,10 +45,10 @@ class _accumulate_meta(type):
     def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A) -> Iterator[A]: ...
     @staticmethod
     @override
-    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, _missing)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, _missing)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer]
         if initial is _missing:
-            return _accumulate(binop, seq)  # type: ignore[arg-type, return-value]
-        return _accumulate(binop, seq, initial)  # type: ignore[arg-type]
+            return cyaccumulate(binop, seq)  # type: ignore[arg-type, return-value]  # pyright: ignore[reportUnknownVariableType]
+        return cyaccumulate(binop, seq, initial)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _accumulate(metaclass=_accumulate_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -70,7 +69,7 @@ class _cons_meta(type):
     @staticmethod
     @override
     def __call__(el: T, seq: Iterable[T]) -> Iterator[T]:
-        return _cons(el, seq)
+        return cycons(el, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _cons(metaclass=_cons_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -91,7 +90,7 @@ class _interpose_meta(type):
     @staticmethod
     @override
     def __call__(el: T, seq: Iterable[T]) -> Iterator[T]:
-        return _interpose(el, seq)
+        return cyinterpose(el, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _interpose(metaclass=_interpose_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -112,7 +111,7 @@ class _interleave_meta(type):
     @staticmethod
     @override
     def __call__(seqs: Iterable[Iterable[T]]) -> Iterable[T]:
-        return _interleave(seqs)
+        return cyinterleave(seqs)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _interleave(metaclass=_interleave_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -130,7 +129,7 @@ class _iterate_meta(type):
     @staticmethod
     @override
     def __call__(func: Callable[[T], T], x: T) -> Iterator[T]:
-        return _iterate(func, x)
+        return cyiterate(func, x)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _iterate(metaclass=_iterate_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -151,7 +150,7 @@ class _concat_meta(type):
     @staticmethod
     @override
     def __call__(seqs: Iterable[Iterable[T]]) -> Iterator[T]:
-        return _concat(seqs)
+        return cyconcat(seqs)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _concat(metaclass=_concat_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -169,7 +168,7 @@ class _concatv_meta(type):
     @staticmethod
     @override
     def __call__(*seqs: Iterable[T]) -> Iterator[T]:
-        return _concatv(*seqs)
+        return cyconcatv(*seqs)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _concatv(metaclass=_concatv_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -187,7 +186,7 @@ class _mapcat_meta(type):
     @staticmethod
     @override
     def __call__(func: Callable[[T], Iterable[R]], seqs: Iterable[T]) -> Iterator[R]:
-        return _mapcat(func, seqs)
+        return cymapcat(func, seqs)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _mapcat(metaclass=_mapcat_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

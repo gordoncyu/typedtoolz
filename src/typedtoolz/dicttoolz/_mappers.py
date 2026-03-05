@@ -1,9 +1,7 @@
-# TODO: Review msc impl
-# USES ANY
 from collections.abc import Callable, Mapping, MutableMapping
 from typing import Any, TypeVar, cast
 from typing_extensions import override, overload
-from cytoolz.dicttoolz import valmap as _valmap, keymap as _keymap, itemmap as _itemmap
+from cytoolz.dicttoolz import valmap as cyvalmap, keymap as cykeymap, itemmap as cyitemmap  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 K = TypeVar('K')
@@ -24,10 +22,10 @@ class _valmap_meta(type):
     def __call__(func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[V], W], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, W] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _valmap(func, d)
-        return _valmap(func, d, factory)  # type: ignore[arg-type]
+            return cyvalmap(func, d)  # pyright: ignore[reportUnknownVariableType]
+        return cyvalmap(func, d, factory)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _valmap(metaclass=_valmap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -53,10 +51,10 @@ class _keymap_meta(type):
     def __call__(func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[K], J], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _keymap(func, d)
-        return _keymap(func, d, factory)  # type: ignore[arg-type]
+            return cykeymap(func, d)  # pyright: ignore[reportUnknownVariableType]
+        return cykeymap(func, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _keymap(metaclass=_keymap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -82,10 +80,10 @@ class _itemmap_meta(type):
     def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, W] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(func: Callable[[tuple[K, V]], tuple[J, W]], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[J, W] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _itemmap(func, d)
-        return _itemmap(func, d, factory)  # type: ignore[arg-type]
+            return cyitemmap(func, d)  # pyright: ignore[reportUnknownVariableType]
+        return cyitemmap(func, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _itemmap(metaclass=_itemmap_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

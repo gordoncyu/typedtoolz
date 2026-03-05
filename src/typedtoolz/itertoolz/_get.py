@@ -1,8 +1,8 @@
-# TODO: Review msc impl
+# TODO: scriptify
 from collections.abc import Mapping, Sequence
 from typing import TypeVar, cast
 from typing_extensions import override, overload
-from cytoolz.itertoolz import get as _get
+from cytoolz.itertoolz import get as cyget  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -34,10 +34,10 @@ class _get_meta(type):
     def __call__(ind: K, seq: Mapping[K, V], default: D) -> V | D: ...
     @staticmethod
     @override
-    def __call__(ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, _missing)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, _missing)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer]
         if default is _missing:
-            return _get(ind, seq)  # type: ignore[arg-type, return-value]
-        return _get(ind, seq, default)  # type: ignore[arg-type, return-value]
+            return cyget(ind, seq)  # pyright: ignore[reportUnknownVariableType]
+        return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _get(metaclass=_get_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

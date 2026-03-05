@@ -1,9 +1,9 @@
-# TODO: Review msc impl
 from collections.abc import Iterable, Iterator
 from typing import TypeVar, cast
 from typing_extensions import override, overload
-from cytoolz.itertoolz import sliding_window as _sliding_window, partition as _partition, partition_all as _partition_all
+from cytoolz.itertoolz import sliding_window as cysliding_window, partition as cypartition, partition_all as cypartition_all  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 
 T = TypeVar('T')
 D = TypeVar('D')
@@ -15,7 +15,7 @@ class _sliding_window_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
-        return _sliding_window(n, seq)
+        return cysliding_window(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _sliding_window(metaclass=_sliding_window_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -41,10 +41,15 @@ class _partition_meta(type):
     def __call__(n: int, seq: Iterable[T], pad: D) -> Iterator[tuple[T | D, ...]]: ...
     @staticmethod
     @override
-    def __call__(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
         if pad is _missing:
-            return _partition(n, seq)
-        return _partition(n, seq, pad)  # type: ignore[arg-type]
+            return cypartition(n, seq)  # pyright: ignore[reportUnknownVariableType]
+        return cypartition(n, seq, pad)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _partition(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
+        if pad is _missing:
+            return cypartition(n, seq)  # pyright: ignore[reportUnknownVariableType]
+        return cypartition(n, seq, pad)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _partition(metaclass=_partition_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -55,7 +60,7 @@ class _partition(metaclass=_partition_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _partition_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2, _partition_meta._partition)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 partition = _partition  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -65,7 +70,7 @@ class _partition_all_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
-        return _partition_all(n, seq)
+        return cypartition_all(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _partition_all(metaclass=_partition_all_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

@@ -1,8 +1,7 @@
-# TODO: Review msc impl
 from collections.abc import Iterable, Iterator
 from typing import TypeVar, cast
 from typing_extensions import override
-from cytoolz.itertoolz import random_sample as _random_sample
+from cytoolz.itertoolz import random_sample as cyrandom_sample  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -15,8 +14,8 @@ class _random_sample_meta(type):
     @override
     def __call__(prob: float, seq: Iterable[T], random_state: int | None = cast(int | None, _missing)) -> Iterator[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if random_state is _missing:
-            return _random_sample(prob, seq)
-        return _random_sample(prob, seq, random_state)  # type: ignore[arg-type]
+            return cyrandom_sample(prob, seq)  # pyright: ignore[reportUnknownVariableType]
+        return cyrandom_sample(prob, seq, random_state)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _random_sample(metaclass=_random_sample_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

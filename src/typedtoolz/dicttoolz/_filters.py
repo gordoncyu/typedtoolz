@@ -1,9 +1,7 @@
-# TODO: Review msc impl
-# USES ANY
 from collections.abc import Callable, Mapping, MutableMapping
 from typing import Any, TypeVar, cast
 from typing_extensions import override, overload
-from cytoolz.dicttoolz import valfilter as _valfilter, keyfilter as _keyfilter, itemfilter as _itemfilter
+from cytoolz.dicttoolz import valfilter as cyvalfilter, keyfilter as cykeyfilter, itemfilter as cyitemfilter  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 K = TypeVar('K')
@@ -22,10 +20,10 @@ class _valfilter_meta(type):
     def __call__(predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[V], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _valfilter(predicate, d)
-        return _valfilter(predicate, d, factory)  # type: ignore[arg-type]
+            return cyvalfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
+        return cyvalfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _valfilter(metaclass=_valfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -51,10 +49,10 @@ class _keyfilter_meta(type):
     def __call__(predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[K], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _keyfilter(predicate, d)
-        return _keyfilter(predicate, d, factory)  # type: ignore[arg-type]
+            return cykeyfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
+        return cykeyfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _keyfilter(metaclass=_keyfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -80,10 +78,10 @@ class _itemfilter_meta(type):
     def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F]) -> F: ...
     @staticmethod
     @override
-    def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(predicate: Callable[[tuple[K, V]], object], d: Mapping[K, V], factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
         if factory is _missing:
-            return _itemfilter(predicate, d)
-        return _itemfilter(predicate, d, factory)  # type: ignore[arg-type]
+            return cyitemfilter(predicate, d)  # pyright: ignore[reportUnknownVariableType]
+        return cyitemfilter(predicate, d, factory)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 
 
 class _itemfilter(metaclass=_itemfilter_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

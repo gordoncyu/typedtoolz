@@ -1,8 +1,7 @@
-# TODO: Review msc impl
 from collections.abc import Iterable, Iterator
 from typing import Literal, TypeVar, TypeVarTuple
 from typing_extensions import override, overload
-from cytoolz.itertoolz import first as _first, second as _second, nth as _nth, last as _last, rest as _rest, peek as _peek, peekn as _peekn
+from cytoolz.itertoolz import first as cyfirst, second as cysecond, nth as cynth, last as cylast, rest as cyrest, peek as cypeek, peekn as cypeekn  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -55,8 +54,8 @@ class _nth_meta(type):
     def __call__(n: int, seq: Iterable[T]) -> T: ...
     @staticmethod
     @override
-    def __call__(n: int, seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
-        return _nth(n, seq)  # type: ignore[return-value]
+    def __call__(n: int, seq: Iterable[T]) -> T:
+        return cynth(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _nth(metaclass=_nth_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -82,8 +81,8 @@ class _first_meta(type):
     def __call__(seq: Iterable[T]) -> T: ...
     @staticmethod
     @override
-    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
-        return _first(seq)
+    def __call__(seq: Iterable[T]) -> T:
+        return cyfirst(seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _first(metaclass=_first_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -106,8 +105,8 @@ class _second_meta(type):
     def __call__(seq: Iterable[T]) -> T: ...
     @staticmethod
     @override
-    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
-        return _second(seq)
+    def __call__(seq: Iterable[T]) -> T:
+        return cysecond(seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _second(metaclass=_second_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -130,8 +129,8 @@ class _last_meta(type):
     def __call__(seq: Iterable[T]) -> T: ...
     @staticmethod
     @override
-    def __call__(seq: Iterable[T]) -> T:  # pyright: ignore[reportInconsistentOverload]
-        return _last(seq)
+    def __call__(seq: Iterable[T]) -> T:
+        return cylast(seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _last(metaclass=_last_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -149,7 +148,7 @@ class _rest_meta(type):
     @staticmethod
     @override
     def __call__(seq: Iterable[T]) -> Iterator[T]:
-        return _rest(seq)
+        return cyrest(seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _rest(metaclass=_rest_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -167,7 +166,7 @@ class _peek_meta(type):
     @staticmethod
     @override
     def __call__(seq: Iterable[T]) -> tuple[T, Iterator[T]]:
-        return _peek(seq)
+        return cypeek(seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _peek(metaclass=_peek_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -185,7 +184,7 @@ class _peekn_meta(type):
     @staticmethod
     @override
     def __call__(n: int, seq: Iterable[T]) -> tuple[list[T], Iterator[T]]:
-        return _peekn(n, seq)
+        return cypeekn(n, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _peekn(metaclass=_peekn_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

@@ -1,8 +1,7 @@
-# TODO: Review msc impl
 from collections.abc import Callable, Iterable
 from typing import TypeVar, cast
 from typing_extensions import override, overload
-from toolz.sandbox.parallel import fold as _fold
+from toolz.sandbox.parallel import fold as tz_fold  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -38,8 +37,8 @@ class _fold_meta(type):
     @override
     def __call__(binop: Callable[[A, T], A], seq: Iterable[T], default: A = cast(A, _missing), **kwargs: object) -> A:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
         if default is _missing:
-            return _fold(binop, seq, **kwargs)  # type: ignore[arg-type, return-value]
-        return _fold(binop, seq, default, **kwargs)  # type: ignore[arg-type]
+            return tz_fold(binop, seq, **kwargs)  # pyright: ignore[reportUnknownVariableType, reportArgumentType]
+        return tz_fold(binop, seq, default, **kwargs)  # pyright: ignore[reportArgumentType, reportUnknownVariableType]
 
 
 class _fold(metaclass=_fold_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

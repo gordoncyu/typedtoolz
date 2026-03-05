@@ -2,7 +2,7 @@
 from collections.abc import Callable, Iterable, Iterator
 from typing import TypeVar
 from typing_extensions import override
-from cytoolz.recipes import partitionby as _partitionby
+from cytoolz.recipes import partitionby as cypartitionby  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -12,7 +12,7 @@ class _partitionby_meta(type):
     @staticmethod
     @override
     def __call__(func: Callable[[T], object], seq: Iterable[T]) -> Iterator[tuple[T, ...]]:
-        return _partitionby(func, seq)
+        return cypartitionby(func, seq)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _partitionby(metaclass=_partitionby_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

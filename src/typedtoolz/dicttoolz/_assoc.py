@@ -1,9 +1,7 @@
-# TODO: Review msc impl
-# USES ANY
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from typing import Any, TypeVar, cast
 from typing_extensions import override, overload
-from cytoolz.dicttoolz import assoc as _assoc, dissoc as _dissoc, assoc_in as _assoc_in, update_in as _update_in, get_in as _get_in
+from cytoolz.dicttoolz import assoc as cyassoc, dissoc as cydissoc, assoc_in as cyassoc_in, update_in as cyupdate_in, get_in as cyget_in  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 K = TypeVar('K')
@@ -17,7 +15,7 @@ class _assoc_meta(type):
     @staticmethod
     @override
     def __call__(d: Mapping[K, V], key: K, value: V) -> dict[K, V]:
-        return _assoc(d, key, value)
+        return cyassoc(d, key, value)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _assoc(metaclass=_assoc_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -38,7 +36,7 @@ class _dissoc_meta(type):
     @staticmethod
     @override
     def __call__(d: Mapping[K, V], *keys: K) -> dict[K, V]:
-        return _dissoc(d, *keys)
+        return cydissoc(d, *keys)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _dissoc(metaclass=_dissoc_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -59,7 +57,7 @@ class _assoc_in_meta(type):
     @staticmethod
     @override
     def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
-        return _assoc_in(d, keys, value)
+        return cyassoc_in(d, keys, value)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _assoc_in(metaclass=_assoc_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -79,10 +77,10 @@ assoc_in = _assoc_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/m
 class _update_in_meta(type):
     @staticmethod
     @override
-    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = cast(object, _missing)) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = _missing) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
         if default is _missing:
-            return _update_in(d, keys, func)
-        return _update_in(d, keys, func, default)
+            return cyupdate_in(d, keys, func)  # pyright: ignore[reportUnknownVariableType]
+        return cyupdate_in(d, keys, func, default)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _update_in(metaclass=_update_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -102,16 +100,16 @@ update_in = _update_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob
 class _get_in_meta(type):
     @staticmethod
     @overload
-    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], *, no_default: bool = ...) -> Any: ...  # pyright: ignore[reportExplicitAny]
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], *, no_default: bool = ...) -> Any: ...  # pyright: ignore[reportExplicitAny, reportAny]
     @staticmethod
     @overload
     def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D, no_default: bool = ...) -> Any | D: ...  # pyright: ignore[reportExplicitAny]
     @staticmethod
     @override
-    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = cast(D, _missing), no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer, reportInconsistentOverload]
+    def __call__(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any], default: D = cast(D, _missing), no_default: bool = False) -> Any | D:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
         if default is _missing:
-            return _get_in(keys, coll, no_default=no_default)
-        return _get_in(keys, coll, default, no_default=no_default)  # type: ignore[arg-type]
+            return cyget_in(keys, coll, no_default=no_default)  # pyright: ignore[reportUnknownVariableType]
+        return cyget_in(keys, coll, default, no_default=no_default)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _get_in(metaclass=_get_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

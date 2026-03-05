@@ -1,8 +1,7 @@
-# TODO: Review msc impl
 from collections.abc import Callable, Iterable
 from typing import TypeVar, cast
 from typing_extensions import override
-from cytoolz.itertoolz import merge_sorted as _merge_sorted, topk as _topk
+from cytoolz.itertoolz import merge_sorted as cymerge_sorted, topk as cytopk  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 
 T = TypeVar('T')
@@ -15,8 +14,8 @@ class _merge_sorted_meta(type):
     @override
     def __call__(*seqs: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> Iterable[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
-            return _merge_sorted(*seqs)
-        return _merge_sorted(*seqs, key=key)  # type: ignore[arg-type]
+            return cymerge_sorted(*seqs)  # pyright: ignore[reportUnknownVariableType]
+        return cymerge_sorted(*seqs, key=key)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _merge_sorted(metaclass=_merge_sorted_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -35,8 +34,8 @@ class _topk_meta(type):
     @override
     def __call__(k: int, seq: Iterable[T], key: Callable[[T], object] = cast(Callable[[T], object], _missing)) -> list[T]:  # pyright: ignore[reportCallInDefaultInitializer]
         if key is _missing:
-            return _topk(k, seq)
-        return _topk(k, seq, key=key)  # type: ignore[arg-type]
+            return cytopk(k, seq)  # pyright: ignore[reportUnknownVariableType]
+        return cytopk(k, seq, key=key)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _topk(metaclass=_topk_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

@@ -66,7 +66,7 @@ class _reduce(metaclass=_reduce_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _reduce_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2, _reduce_meta._reduce)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 reduce = _reduce  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
