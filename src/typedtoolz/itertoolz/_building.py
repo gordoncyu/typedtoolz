@@ -184,6 +184,7 @@ class _concatv(metaclass=_concatv_meta):  # See: https://github.com/gordoncyu/ty
     """
 
 
+# TODO: Consider making more useful for currying with a variant that requires at least 2 iterables
 concatv = _concatv  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 

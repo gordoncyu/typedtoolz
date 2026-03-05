@@ -2,7 +2,7 @@ from collections.abc import Callable, Mapping
 from typing import TypeVar
 from typing_extensions import override
 from cytoolz.dicttoolz import merge as cymerge, merge_with as cymerge_with  # pyright: ignore[reportUnknownVariableType]
-from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 
 K = TypeVar('K')
 V = TypeVar('V')
@@ -23,9 +23,8 @@ class _merge(metaclass=_merge_meta):  # See: https://github.com/gordoncyu/typedt
     Merge a collection of dictionaries.
     """
 
-
+# TODO: Consider making more useful for currying with a variant that requires at least 2 dicts
 merge = _merge  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
-
 
 class _merge_with_meta(type):
     @staticmethod
@@ -42,9 +41,10 @@ class _merge_with(metaclass=_merge_with_meta):  # See: https://github.com/gordon
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _merge_with_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2, _merge_with_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
+# TODO: Consider making more useful for currying with a variant that requires at least 2 dicts
 merge_with = _merge_with  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
 __all__ = ["merge", "merge_with"]

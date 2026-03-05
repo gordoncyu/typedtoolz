@@ -3,6 +3,7 @@ from typing import Any, TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.dicttoolz import assoc as cyassoc, dissoc as cydissoc, assoc_in as cyassoc_in, update_in as cyupdate_in, get_in as cyget_in  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.functoolz._curryv import curryv
 
 K = TypeVar('K')
 V = TypeVar('V')
@@ -47,7 +48,7 @@ class _dissoc(metaclass=_dissoc_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(1, _dissoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2, _dissoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 dissoc = _dissoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

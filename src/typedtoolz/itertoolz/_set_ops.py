@@ -53,6 +53,30 @@ class _diff_meta(type):
             kwargs['default'] = default
         return cydiff(*seqs, **kwargs)  # pyright: ignore[reportUnknownVariableType]
 
+    @staticmethod
+    def _call(
+            *seqs: Iterable[T],
+            ) -> Iterator[tuple[T, ...]]:
+        return cydiff(*seqs)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_default(
+            default: T,
+            *seqs: Iterable[T],
+            ) -> Iterator[tuple[T, ...]]:
+        return cydiff(*seqs, default=default)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_key(
+            key: Callable[[T], object],
+            *seqs: Iterable[T],
+            ) -> Iterator[tuple[T, ...]]:
+        return cydiff(*seqs, key=key)  # pyright: ignore[reportUnknownVariableType]
+    @staticmethod
+    def _call_default_key(
+            default: T,
+            key: Callable[[T], object],
+            *seqs: Iterable[T],
+            ) -> Iterator[tuple[T, ...]]:
+        return cydiff(*seqs, default=default, key=key)  # pyright: ignore[reportUnknownVariableType]
 
 class _diff(metaclass=_diff_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """
@@ -60,7 +84,10 @@ class _diff(metaclass=_diff_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Return those items that differ between sequences.
     """
-    c = curryv(1, _diff_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(1, _diff_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cd = curryv(2, _diff_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    ck = curryv(2, _diff_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cdk = curryv(3, _diff_meta._call_default_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 diff = _diff  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
