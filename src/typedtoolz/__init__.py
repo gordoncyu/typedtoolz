@@ -33,19 +33,8 @@ Z = TypeVar("Z")
 Ts = TypeVarTuple("Ts")
 Ps = ParamSpec("Ps")
 
-def identity(x: A) -> A:
-    """Return x unchanged."""
-    return x
+from typedtoolz._top_level import identity, identityv, return_none
 
-def identityv(*args: *Ts) -> tuple[*Ts]:
-    """Return all positional arguments as a tuple, unchanged."""
-    return args
-
-def return_none(*_: TypeVarTuple, **__: object) -> None:  # pyright: ignore[reportUnusedParameter]
-    """Accept any arguments and return None."""
-    return None
-
-# Submodule imports must come after definitions above (submodules depend on identity/return_none)
 from typedtoolz import functoolz, itertoolz, dicttoolz, sandbox, recipes
 from typedtoolz.recipes import countby, partitionby
 from typedtoolz.functoolz import (

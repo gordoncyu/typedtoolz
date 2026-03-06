@@ -20,7 +20,7 @@ from ._apply import apply
 from ._introspection import num_required_args, has_varargs, has_keywords, is_valid_args, is_partial_args, is_arity
 from ._instanceproperty import instanceproperty, InstanceProperty
 from ._partial import partial
-from typedtoolz import identity, return_none
+from typedtoolz._top_level import identity, return_none
 
 __all__ = [
         "no_default",

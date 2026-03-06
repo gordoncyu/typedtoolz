@@ -1,7 +1,7 @@
 from cytoolz import excepts as cyexcepts
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 from typing_extensions import override
-from typedtoolz import identity, return_none
+from typedtoolz._top_level import identity, return_none
 from typedtoolz.functoolz._curry import curry
 from functools import wraps
 import logging
