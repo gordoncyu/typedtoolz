@@ -5,7 +5,6 @@ from typing_extensions import override, overload
 from cytoolz.itertoolz import groupby as cygroupby, reduceby as cyreduceby, frequencies as cyfrequencies  # pyright: ignore[reportUnknownVariableType]
 from cytoolz.recipes import countby as cycountby  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
-from typedtoolz.functoolz._curryv import curryv
 
 T = TypeVar('T')
 K = TypeVar('K')

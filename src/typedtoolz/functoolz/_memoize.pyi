@@ -1,5 +1,5 @@
 # USES ANY
-from typing import Callable, ParamSpec, TypeVar, cast
+from typing import Callable, ParamSpec, TypeVar
 
 from typedtoolz.functoolz._curryv import curryv
 

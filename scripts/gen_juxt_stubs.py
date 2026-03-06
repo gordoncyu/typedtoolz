@@ -29,4 +29,4 @@ for n in range(1, MAX + 1):
 
 # ── fallback ───────────────────────────────────────────────────────────
 print("@overload")
-print("def juxt(*funcs: Callable[..., Any], /) -> Callable[..., tuple[Any, ...]]: ...")
+print("def juxt(*funcs: Callable[..., Any]) -> Callable[..., tuple[Any, ...]]: ...  # pyright: ignore[reportExplicitAny]")

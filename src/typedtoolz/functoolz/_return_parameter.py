@@ -52,7 +52,7 @@ Examples::
 """
 
 import threading
-from functools import wraps, reduce
+from functools import wraps
 from typing import Any, TypeVar, TypeVarTuple, Callable
 
 PTs = TypeVarTuple("PTs")

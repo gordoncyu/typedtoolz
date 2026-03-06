@@ -1,7 +1,7 @@
 from collections.abc import Iterable, Iterator
 from typing import Callable, TypeVar
-from typing_extensions import Any, overload, override
-from typedtoolz.functoolz import curry, curryv
+from typing_extensions import Any, override
+from typedtoolz.functoolz import curryv
 from builtins import map as cymap
 import sys
 
@@ -13,16 +13,16 @@ _T5 = TypeVar("_T5")
 _S = TypeVar("_S")
 class _map_meta(type):
     if sys.version_info >= (3, 14): # 3.14 adds `strict` argument.
-        @staticmethod
+        @staticmethod  # pyright: ignore[reportUnreachable]
         @override
         def __call__(
                 func: Callable[..., _S],
-                iterable: Iterable[Any],  # pyright: ignore[reportExplicitAny]
+                iterable: Iterable[Any],  # pyright: ignore[reportExplicitAny, reportUnnecessaryTypeIgnoreComment]
                 /,
-                *iterables: Iterable[Any],  # pyright: ignore[reportExplicitAny]
+                *iterables: Iterable[Any],  # pyright: ignore[reportExplicitAny, reportUnnecessaryTypeIgnoreComment]
                 strict: bool = False,
                 ) -> Iterator[_S]:
-            return cymap(func, iterable, *iterables, strict=strict)  # pyright: ignore[reportCallIssue]
+            return cymap(func, iterable, *iterables, strict=strict)
     else:
         @staticmethod
         @override

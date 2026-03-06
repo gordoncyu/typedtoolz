@@ -1,6 +1,6 @@
 from collections.abc import Callable, Iterable, Mapping, Sequence
-from typing import Any, TypeVar, cast
-from typing_extensions import override, overload
+from typing import Any, TypeVar
+from typing_extensions import override
 from cytoolz.dicttoolz import assoc as cyassoc, dissoc as cydissoc, assoc_in as cyassoc_in, update_in as cyupdate_in, get_in as cyget_in  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 from typedtoolz.functoolz._curryv import curryv
@@ -107,7 +107,7 @@ class _get_in_meta(type):
         return cyget_in(keys, coll, default, no_default=no_default)  # pyright: ignore[reportUnknownVariableType]
 
     @staticmethod
-    def _call(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any]) -> Any | D:  # pyright: ignore[reportExplicitAny]
+    def _call(keys: Iterable[object], coll: Mapping[object, Any] | Sequence[Any]) -> Any:  # pyright: ignore[reportExplicitAny, reportAny]
         return cyget_in(keys, coll, no_default=True)  # pyright: ignore[reportUnknownVariableType]
 
     @staticmethod

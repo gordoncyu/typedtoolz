@@ -28,7 +28,7 @@ def tv(i: int, n: int) -> str:
 
 
 # ── header ────────────────────────────────────────────────────────────
-print("from typing import Callable, TypeVar, TypeVarTuple, Unpack, overload\n")
+print("from typing import Callable, TypeVar, TypeVarTuple, overload\n")
 
 print("A = TypeVar('A', contravariant=True)")
 for i in range(1, MAX):

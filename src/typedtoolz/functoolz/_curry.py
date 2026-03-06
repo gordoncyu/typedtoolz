@@ -1,4 +1,4 @@
-from cytoolz.functoolz import curry as _toolz_curry
+from cytoolz.functoolz import curry as _toolz_curry  # pyright: ignore[reportUnknownVariableType]
 from typing import Any
 
 
@@ -25,10 +25,10 @@ def curry(pn_or_fn: Any, fn: Any = None, /) -> Any:  # pyright: ignore[reportAny
     Delegates to toolz.functoolz.curry.
     """
     if fn is None:
-        if callable(pn_or_fn):
-            return _toolz_curry(pn_or_fn)  # pyright: ignore[reportAny]
-        return lambda f: _toolz_curry(f)  # pyright: ignore[reportAny]
-    return _toolz_curry(fn)  # pyright: ignore[reportAny]
+        if callable(pn_or_fn):  # pyright: ignore[reportAny]
+            return _toolz_curry(pn_or_fn)  # pyright: ignore[reportUnknownVariableType]
+        return lambda f: _toolz_curry(f)  # pyright: ignore[reportUnknownVariableType, reportUnknownLambdaType]
+    return _toolz_curry(fn)  # pyright: ignore[reportUnknownVariableType]
 
 
 __all__ = [

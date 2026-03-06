@@ -1,5 +1,5 @@
 from itertools import takewhile
-from typing import Any, Callable, ParamSpec, Protocol, TypeIs, ContextManager, TypeVar, TypeVarTuple, get_args
+from typing import Any, Callable, ParamSpec, TypeIs, ContextManager, TypeVar
 import inspect
 from inspect import Parameter
 from typing_extensions import TypeGuard

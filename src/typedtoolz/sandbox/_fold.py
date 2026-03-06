@@ -2,7 +2,6 @@ from collections.abc import Callable, Iterable
 from typing import TypeVar, cast
 from typing_extensions import override, overload
 from toolz.sandbox.parallel import fold as tz_fold  # pyright: ignore[reportUnknownVariableType]
-from typedtoolz.functoolz._curry import curry
 from typedtoolz.functoolz._curryv import curryv
 
 T = TypeVar('T')

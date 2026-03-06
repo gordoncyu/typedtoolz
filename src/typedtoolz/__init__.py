@@ -38,6 +38,6 @@ def identityv(*args: *Ts) -> tuple[*Ts]:
     """Return all positional arguments as a tuple, unchanged."""
     return args
 
-def return_none(*_: TypeVarTuple, **__: object) -> None:
+def return_none(*_: TypeVarTuple, **__: object) -> None:  # pyright: ignore[reportUnusedParameter]
     """Accept any arguments and return None."""
     return None

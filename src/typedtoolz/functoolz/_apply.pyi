@@ -1,5 +1,4 @@
-from collections.abc import Iterable, Mapping
-from typing import Callable, TypeVar, overload
+from typing import Callable, TypeVar
 from typing_extensions import ParamSpec
 
 R = TypeVar("R")

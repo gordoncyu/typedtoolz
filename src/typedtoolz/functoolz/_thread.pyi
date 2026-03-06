@@ -1,4 +1,4 @@
-from typing import Callable, TypeVar, TypeVarTuple, Unpack, overload
+from typing import Callable, TypeVar, TypeVarTuple, overload
 
 A = TypeVar('A', contravariant=True)
 T1 = TypeVar('T1')

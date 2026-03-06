@@ -57,7 +57,7 @@ def emit_body(n: int, fixed_only: bool) -> None:
     # kwargs-only → return self (only for CurriedV*, not CurriedFixedV*)
     if not fixed_only:
         print("    @overload")
-        print(f"    def __call__(self, **kw: Any) -> '{cls}{n}[{full_gen}]': ...")
+        print(f"    def __call__(self, **kw: Any) -> '{cls}{n}[{full_gen}]': ...  # pyright: ignore[reportAny, reportExplicitAny]")
     print()
 
 

@@ -20,7 +20,7 @@ class CurriedV1(Protocol[A1, P, R]):
     @overload
     def __call__(self) -> 'CurriedV1[A1, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV1[A1, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV1[A1, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV1(Protocol[A1, *Ts, R]):
     @overload
@@ -36,7 +36,7 @@ class CurriedV2(Protocol[A1, A2, P, R]):
     @overload
     def __call__(self) -> 'CurriedV2[A1, A2, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV2[A1, A2, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV2[A1, A2, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV2(Protocol[A1, A2, *Ts, R]):
     @overload
@@ -56,7 +56,7 @@ class CurriedV3(Protocol[A1, A2, A3, P, R]):
     @overload
     def __call__(self) -> 'CurriedV3[A1, A2, A3, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV3[A1, A2, A3, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV3[A1, A2, A3, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV3(Protocol[A1, A2, A3, *Ts, R]):
     @overload
@@ -80,7 +80,7 @@ class CurriedV4(Protocol[A1, A2, A3, A4, P, R]):
     @overload
     def __call__(self) -> 'CurriedV4[A1, A2, A3, A4, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV4[A1, A2, A3, A4, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV4[A1, A2, A3, A4, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV4(Protocol[A1, A2, A3, A4, *Ts, R]):
     @overload
@@ -108,7 +108,7 @@ class CurriedV5(Protocol[A1, A2, A3, A4, A5, P, R]):
     @overload
     def __call__(self) -> 'CurriedV5[A1, A2, A3, A4, A5, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV5[A1, A2, A3, A4, A5, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV5[A1, A2, A3, A4, A5, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV5(Protocol[A1, A2, A3, A4, A5, *Ts, R]):
     @overload
@@ -140,7 +140,7 @@ class CurriedV6(Protocol[A1, A2, A3, A4, A5, A6, P, R]):
     @overload
     def __call__(self) -> 'CurriedV6[A1, A2, A3, A4, A5, A6, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV6[A1, A2, A3, A4, A5, A6, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV6[A1, A2, A3, A4, A5, A6, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV6(Protocol[A1, A2, A3, A4, A5, A6, *Ts, R]):
     @overload
@@ -176,7 +176,7 @@ class CurriedV7(Protocol[A1, A2, A3, A4, A5, A6, A7, P, R]):
     @overload
     def __call__(self) -> 'CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV7(Protocol[A1, A2, A3, A4, A5, A6, A7, *Ts, R]):
     @overload
@@ -216,7 +216,7 @@ class CurriedV8(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, P, R]):
     @overload
     def __call__(self) -> 'CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV8(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, *Ts, R]):
     @overload
@@ -260,7 +260,7 @@ class CurriedV9(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]):
     @overload
     def __call__(self) -> 'CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV9(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, *Ts, R]):
     @overload
@@ -308,7 +308,7 @@ class CurriedV10(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]):
     @overload
     def __call__(self) -> 'CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]': ...
     @overload
-    def __call__(self, **kw: Any) -> 'CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]': ...
+    def __call__(self, **kw: Any) -> 'CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class CurriedFixedV10(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts, R]):
     @overload

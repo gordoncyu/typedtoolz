@@ -1,5 +1,5 @@
 from collections.abc import Callable, Iterable
-from typing import TYPE_CHECKING, Generic, ReadOnly, TypeVar, cast, reveal_type
+from typing import Generic, TypeVar, cast
 from typing_extensions import TypedDict, overload, override
 from typedtoolz.functoolz._curryv import curryv
 from typedtoolz.functoolz._reduce import _initial_missing  # pyright: ignore[reportPrivateUsage]
@@ -63,7 +63,7 @@ class _takewhile_acc_meta(type):
         result: list[T] = []
 
         for item in it:
-            match func(acc, item):
+            match func(cast(A, acc), item):
                 case (predicate, acc): ...
                 case {"take": predicate, **rest}: 
                     try:

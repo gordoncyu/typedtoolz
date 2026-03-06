@@ -1,9 +1,7 @@
-from io import TextIOBase, UnsupportedOperation
-from typing import Callable, ContextManager, Literal, ParamSpec, TypeVar, cast
-from typing_extensions import overload, override
-from typedtoolz import identityv
+from typing import Callable, ContextManager, ParamSpec, TypeVar
+from typing_extensions import override
 from typedtoolz.functoolz._curry import curry
-from typedtoolz.utils import is_context_manager, is_zero_required_callable
+from typedtoolz.utils import is_context_manager
 
 
 A = TypeVar("A")

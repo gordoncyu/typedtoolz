@@ -1,3 +1,3 @@
-from cytoolz.functoolz import compose
+from cytoolz.functoolz import compose  # pyright: ignore[reportUnknownVariableType]
 
 __all__ = ["compose"]

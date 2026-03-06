@@ -1,4 +1,4 @@
-from cytoolz.functoolz import pipe
+from cytoolz.functoolz import pipe  # pyright: ignore[reportUnknownVariableType]
 
 __all__ = [
         "pipe",

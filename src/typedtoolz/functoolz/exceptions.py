@@ -1,5 +1,5 @@
 from cytoolz import excepts as cyexcepts
-from typing import Any, Callable, Literal, ParamSpec, TypeVar, get_args
+from typing import Any, Callable, Literal, ParamSpec, TypeVar
 from typing_extensions import override
 from typedtoolz import identity
 from typedtoolz.functoolz._curry import curry

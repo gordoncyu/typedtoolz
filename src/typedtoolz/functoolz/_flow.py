@@ -3,7 +3,7 @@ from typing import Any, Callable, TypeVar
 
 
 T = TypeVar("T")
-def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], Any]:
+def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], Any]:  # pyright: ignore[reportExplicitAny]
     """Compose functions to operate in series, left to right.
 
     Returns a function that applies each function in sequence so that
@@ -16,7 +16,7 @@ def flow(fn: Callable[[T], Any], *fns: Callable[[Any], Any]) -> Callable[[T], An
     See Also:
         pipe
     """
-    return compose_left(fn, *fns)
+    return compose_left(fn, *fns)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
 __all__ = [
         "flow",
