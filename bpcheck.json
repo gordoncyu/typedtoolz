@@ -1,0 +1,5 @@
+{
+    "ignoreMessages": [
+        ["exactly", "reportGeneralTypeIssues", "TypedDict does not support __init_subclass__ parameter \"extra_items\""]
+    ]
+}
