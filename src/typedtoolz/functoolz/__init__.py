@@ -17,6 +17,7 @@ from ._do import do
 from ._flip import flip
 from ._complement import complement
 from ._apply import apply
+from ._introspection import num_required_args, has_varargs, has_keywords, is_valid_args, is_partial_args, is_arity
 
 __all__ = [
         "no_default",
@@ -43,5 +44,11 @@ __all__ = [
         "flip",
         "complement",
         "apply",
+        "num_required_args",
+        "has_varargs",
+        "has_keywords",
+        "is_valid_args",
+        "is_partial_args",
+        "is_arity",
         ]
 
