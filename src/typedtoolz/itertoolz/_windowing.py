@@ -7,7 +7,7 @@ from typedtoolz.functoolz._curry import curry
 T = TypeVar('T')
 D = TypeVar('D')
 
-_missing = object()
+no_pad = object()
 
 
 class _sliding_window_meta(type):
@@ -40,8 +40,8 @@ class _partition_meta(type):
     def __call__(n: int, seq: Iterable[T], pad: D) -> Iterator[tuple[T | D, ...]]: ...
     @staticmethod
     @override
-    def __call__(n: int, seq: Iterable[T], pad: D = cast(D, _missing)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if pad is _missing:
+    def __call__(n: int, seq: Iterable[T], pad: D = cast(D, no_pad)) -> Iterator[tuple[T | D, ...]]:  # pyright: ignore[reportCallInDefaultInitializer]
+        if pad is no_pad:
             return cypartition(n, seq)  # pyright: ignore[reportUnknownVariableType]
         return cypartition(n, seq, pad)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
     @staticmethod

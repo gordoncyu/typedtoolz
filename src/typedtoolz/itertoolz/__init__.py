@@ -6,7 +6,7 @@ from ._slicing import take, tail, drop, take_nth
 from ._testing import isiterable, isdistinct, count
 from ._get import get
 from ._pluck import pluck
-from ._windowing import sliding_window, partition, partition_all
+from ._windowing import no_pad, sliding_window, partition, partition_all
 from ._grouping import groupby, reduceby, frequencies
 from ._set_ops import unique, diff, join
 from ._building import remove, accumulate, cons, interpose, interleave, iterate, concat, concatv, mapcat
@@ -15,6 +15,7 @@ from ._statistics import random_sample
 
 __all__ = [
         "no_default",
+        "no_pad",
         "map",
         "takewhile_acc",
         "first",
