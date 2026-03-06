@@ -6,12 +6,11 @@ from ._testing import isiterable, isdistinct, count
 from ._get import get
 from ._pluck import pluck
 from ._windowing import sliding_window, partition, partition_all
-from ._grouping import groupby, reduceby, frequencies, countby
+from ._grouping import groupby, reduceby, frequencies
 from ._set_ops import unique, diff, join
 from ._building import remove, accumulate, cons, interpose, interleave, iterate, concat, concatv, mapcat
 from ._sorting import merge_sorted, topk
 from ._statistics import random_sample
-from ._partitionby import partitionby
 
 __all__ = [
         "map",
@@ -38,7 +37,6 @@ __all__ = [
         "groupby",
         "reduceby",
         "frequencies",
-        "countby",
         "unique",
         "diff",
         "join",
@@ -54,5 +52,4 @@ __all__ = [
         "merge_sorted",
         "topk",
         "random_sample",
-        "partitionby",
         ]

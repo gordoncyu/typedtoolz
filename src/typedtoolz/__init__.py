@@ -1,4 +1,7 @@
 from typing import ParamSpec, TypeVar, TypeVarTuple
+from functools import partial
+from builtins import filter, sorted
+from importlib.metadata import version as _pkg_version
 
 A = TypeVar("A")
 B = TypeVar("B")
@@ -41,3 +44,27 @@ def identityv(*args: *Ts) -> tuple[*Ts]:
 def return_none(*_: TypeVarTuple, **__: object) -> None:  # pyright: ignore[reportUnusedParameter]
     """Accept any arguments and return None."""
     return None
+
+# Submodule imports must come after definitions above (submodules depend on identity/return_none)
+from typedtoolz import functoolz, itertoolz, dicttoolz, sandbox, recipes
+from typedtoolz.recipes import countby, partitionby
+from typedtoolz.functoolz import (
+    excepts, reduce, pipe, curry, compose, compose_left,
+    thread_first, thread_last, memoize, juxt, do, flip, complement, apply,
+)
+from typedtoolz.itertoolz import (
+    map, first, second, nth, last, peek, peekn,
+    take, tail, drop, take_nth, isiterable, isdistinct, count,
+    get, pluck, sliding_window, partition, partition_all,
+    groupby, reduceby, frequencies, unique, diff, join,
+    remove, accumulate, cons, interpose, interleave, iterate, concat, concatv,
+    mapcat, merge_sorted, topk, random_sample,
+)
+from typedtoolz.dicttoolz import (
+    merge, merge_with, valmap, keymap, itemmap,
+    valfilter, keyfilter, itemfilter, assoc, dissoc, assoc_in, update_in, get_in,
+)
+
+comp = compose
+
+__version__ = _pkg_version("typedtoolz")
