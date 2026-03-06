@@ -68,6 +68,8 @@ def main() -> None:
     # on that line, so all reportUnnecessaryTypeIgnoreComment warnings there should be suppressed.
     suppressed_locations: set[tuple[str, int]] = set()
     for diag in diagnostics:
+        if "range" not in diag:
+            continue
         if diag.get("rule") == RULE and "message" in diag and SELF_IGNORE_MSG.fullmatch(diag["message"]):
             file = diag["file"]
             line = diag["range"]["start"]["line"]
@@ -77,6 +79,7 @@ def main() -> None:
         diag for diag in diagnostics
         if not (
             diag.get("rule") == RULE
+            and "range" in diag
             and (diag["file"], diag["range"]["start"]["line"]) in suppressed_locations
         )
     ]
@@ -85,13 +88,16 @@ def main() -> None:
 
     for diag in filtered:
         file = diag["file"]
-        line = diag["range"]["start"]["line"] + 1  # convert 0-indexed to 1-indexed
-        col = diag["range"]["start"]["character"] + 1
         severity = diag.get("severity", "warning")
         message = diag["message"].replace("\n", " ")
         rule = diag.get("rule", "")
         rule_str = f" ({rule})" if rule else ""
-        print(f"{file}:{line}:{col}: {severity}: {message}{rule_str}")
+        if "range" in diag:
+            line = diag["range"]["start"]["line"] + 1  # convert 0-indexed to 1-indexed
+            col = diag["range"]["start"]["character"] + 1
+            print(f"{file}:{line}:{col}: {severity}: {message}{rule_str}")
+        else:
+            print(f"{file}: {severity}: {message}{rule_str}")
 
     total = len(diagnostics)
     shown = len(filtered)
