@@ -28,7 +28,7 @@ def instanceproperty(
     fdel: Callable[[S], None] | None = ...,
     doc: str | None = ...,
     classval: object = ...,
-) -> InstanceProperty[T, S]: ...
+) -> InstanceProperty[S, T]: ...
 @overload
 def instanceproperty(
     fget: None = ...,
@@ -36,4 +36,4 @@ def instanceproperty(
     fdel: Callable[[Any], None] | None = ...,  # pyright: ignore[reportExplicitAny]
     doc: str | None = ...,
     classval: object = ...,
-) -> Callable[[Callable[[S], T]], InstanceProperty[T]]: ...
+) -> Callable[[Callable[[S], T]], InstanceProperty[S, T]]: ...
