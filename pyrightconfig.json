@@ -1,0 +1,7 @@
+{
+    "reportUnusedCallResult": "none",
+    "reportMissingTypeStubs": "none",
+    "exclude": [
+        "tests"
+    ]
+}
