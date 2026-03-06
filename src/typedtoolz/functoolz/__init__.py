@@ -19,6 +19,7 @@ from ._complement import complement
 from ._apply import apply
 from ._introspection import num_required_args, has_varargs, has_keywords, is_valid_args, is_partial_args, is_arity
 from ._instanceproperty import instanceproperty, InstanceProperty
+from ._partial import partial
 from typedtoolz import identity, return_none
 
 __all__ = [
@@ -56,5 +57,6 @@ __all__ = [
         "return_none",
         "instanceproperty",
         "InstanceProperty",
+        "partial",
         ]
 
