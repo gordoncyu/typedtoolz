@@ -1,7 +1,7 @@
 from cytoolz import excepts as cyexcepts
 from typing import Any, Callable, Literal, ParamSpec, TypeVar
 from typing_extensions import override
-from typedtoolz import identity
+from typedtoolz import identity, return_none
 from typedtoolz.functoolz._curry import curry
 from functools import wraps
 import logging
@@ -20,11 +20,20 @@ class _excepts_meta(type):
     @staticmethod
     @override
     def __call__(
+        exc: type[E] | tuple[type[E]],
+        func: Callable[Ps, B],
+        handler: Callable[[E], D] = return_none,
+    ) -> Callable[Ps, B | D]:
+        return cyexcepts(exc, func, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+
+    @staticmethod
+    def _call(
         handler: Callable[[E], D],
         exc: type[E] | tuple[type[E]],
         func: Callable[Ps, B],
     ) -> Callable[Ps, B | D]:
         return cyexcepts(exc, func, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
+
 
 class _excepts(metaclass=_excepts_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Wrap func to catch exc and pass the exception to handler.
@@ -36,7 +45,8 @@ class _excepts(metaclass=_excepts_meta):  # See: https://github.com/gordoncyu/ty
 
     Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(_excepts_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(_excepts_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cn = c(return_none)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 excepts = _excepts  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
@@ -47,7 +57,7 @@ class _union_error_meta(type):
             exc: type[E] | tuple[type[E]],
             func: Callable[Ps, B],
             ) -> Callable[Ps, B | E]:
-        return excepts(identity, exc, func)
+        return cyexcepts(exc, func, identity)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
 class _union_error(metaclass=_union_error_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Wrap func so that a caught exception is returned rather than raised.
@@ -75,7 +85,7 @@ class _tuple_error_meta(type):
             return (True, func(*args, **kwargs))
         def handler(e: E):
             return (False, e)
-        return excepts(handler, exc, inner)
+        return cyexcepts(exc, inner, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
 class _tuple_error(metaclass=_tuple_error_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
     """Wrap func to return a success/failure tuple instead of raising.
