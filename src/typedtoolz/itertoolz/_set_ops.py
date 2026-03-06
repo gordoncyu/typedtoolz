@@ -4,13 +4,14 @@ from typing_extensions import override
 from cytoolz.itertoolz import unique as cyunique, diff as cydiff, join as cyjoin  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 from typedtoolz.functoolz._curryv import curryv
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 K = TypeVar('K')
 L = TypeVar('L')
 R = TypeVar('R')
 
-_missing = object()
+_missing = object()  # used for optional key/predicate args (not the no_default API)
 
 
 class _unique_meta(type):
@@ -44,12 +45,12 @@ class _diff_meta(type):
     def __call__(
             *seqs: Iterable[T],
             key: Callable[[T], object] = cast(Callable[[T], object], _missing),  # pyright: ignore[reportCallInDefaultInitializer]
-            default: T = cast(T, _missing),  # pyright: ignore[reportCallInDefaultInitializer]
+            default: T = cast(T, no_default),  # pyright: ignore[reportCallInDefaultInitializer]
             ) -> Iterator[tuple[T, ...]]:
         kwargs: dict[str, object] = {}
         if key is not _missing:
             kwargs['key'] = key
-        if default is not _missing:
+        if default is not no_default:
             kwargs['default'] = default
         return cydiff(*seqs, **kwargs)  # pyright: ignore[reportUnknownVariableType]
 
@@ -100,13 +101,13 @@ class _join_meta(type):
         leftseq: Iterable[L],
         rightkey: Callable[[R], K],
         rightseq: Iterable[R],
-        left_default: L = cast(L, _missing),  # pyright: ignore[reportCallInDefaultInitializer]
-        right_default: R = cast(R, _missing),  # pyright: ignore[reportCallInDefaultInitializer]
+        left_default: L = cast(L, no_default),  # pyright: ignore[reportCallInDefaultInitializer]
+        right_default: R = cast(R, no_default),  # pyright: ignore[reportCallInDefaultInitializer]
     ) -> Iterator[tuple[L, R]]:
         kwargs: dict[str, object] = {}
-        if left_default is not _missing:
+        if left_default is not no_default:
             kwargs['left_default'] = left_default
-        if right_default is not _missing:
+        if right_default is not no_default:
             kwargs['right_default'] = right_default
         return cyjoin(leftkey, leftseq, rightkey, rightseq, **kwargs)  # pyright: ignore[reportUnknownVariableType]
 

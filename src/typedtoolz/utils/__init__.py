@@ -5,7 +5,7 @@ from inspect import Parameter
 from typing_extensions import TypeGuard
 from ._raises import raises
 
-no_default = '__no__default__'
+no_default = object()
 
 
 Ps = ParamSpec("Ps")

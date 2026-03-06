@@ -4,12 +4,11 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.itertoolz import groupby as cygroupby, reduceby as cyreduceby, frequencies as cyfrequencies  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 K = TypeVar('K')
 A = TypeVar('A')
-
-_missing = object()
 
 
 class _groupby_meta(type):
@@ -42,8 +41,8 @@ class _reduceby_meta(type):
     def __call__(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = ...) -> dict[K, A]: ...
     @staticmethod
     @override
-    def __call__(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = cast(Callable[[], A] | A, _missing)) -> dict[K, A]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if init is _missing:
+    def __call__(key: Callable[[T], K], binop: Callable[[A, T], A], seq: Iterable[T], init: Callable[[], A] | A = cast(Callable[[], A] | A, no_default)) -> dict[K, A]:  # pyright: ignore[reportCallInDefaultInitializer]
+        if init is no_default:
             return cyreduceby(key, binop, seq)  # pyright: ignore[reportUnknownVariableType]
         return cyreduceby(key, binop, seq, init)  # pyright: ignore[reportUnknownVariableType]
     @staticmethod

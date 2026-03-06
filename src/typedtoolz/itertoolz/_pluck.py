@@ -3,13 +3,12 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.itertoolz import pluck as cypluck  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 D = TypeVar('D')
 K = TypeVar('K')
 V = TypeVar('V')
-
-_missing = object()
 
 
 class _pluck_meta(type):
@@ -27,8 +26,8 @@ class _pluck_meta(type):
     def __call__(ind: K, seqs: Iterable[Mapping[K, V]], default: D) -> Iterator[V | D]: ...
     @staticmethod
     @override
-    def __call__(ind: int | K, seqs: Iterable[Sequence[T]] | Iterable[Mapping[K, V]], default: D = cast(D, _missing)) -> Iterator[T | V | D]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if default is _missing:
+    def __call__(ind: int | K, seqs: Iterable[Sequence[T]] | Iterable[Mapping[K, V]], default: D = cast(D, no_default)) -> Iterator[T | V | D]:  # pyright: ignore[reportCallInDefaultInitializer]
+        if default is no_default:
             return cypluck(ind, seqs)  # type: ignore[arg-type, return-value]  # pyright: ignore[reportUnknownVariableType]
         return cypluck(ind, seqs, default)  # type: ignore[arg-type, return-value]  # pyright: ignore[reportUnknownVariableType]
 

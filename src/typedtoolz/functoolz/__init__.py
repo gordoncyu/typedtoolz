@@ -1,3 +1,4 @@
+from typedtoolz.utils import no_default
 from .exceptions import excepts, union_error, tuple_error, remap_error
 from ._defer import defer
 from ._with import with_, with_op
@@ -18,6 +19,7 @@ from ._complement import complement
 from ._apply import apply
 
 __all__ = [
+        "no_default",
         "excepts",
         "union_error",
         "tuple_error",

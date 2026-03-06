@@ -3,13 +3,12 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from toolz.sandbox.parallel import fold as tz_fold  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curryv import curryv
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 A = TypeVar('A')
 B = TypeVar('B')
 C = TypeVar('C')
-
-_missing = object()
 
 
 class _fold_meta(type):
@@ -35,8 +34,8 @@ class _fold_meta(type):
     ) -> A: ...
     @staticmethod
     @override
-    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], default: A = cast(A, _missing), **kwargs: object) -> A:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
-        if default is _missing:
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], default: A = cast(A, no_default), **kwargs: object) -> A:  # pyright: ignore[reportCallInDefaultInitializer, reportInconsistentOverload]
+        if default is no_default:
             return tz_fold(binop, seq, **kwargs)  # pyright: ignore[reportUnknownVariableType, reportArgumentType]
         return tz_fold(binop, seq, default, **kwargs)  # pyright: ignore[reportArgumentType, reportUnknownVariableType]
 

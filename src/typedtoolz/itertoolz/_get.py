@@ -4,13 +4,12 @@ from typing import TypeVar, cast
 from typing_extensions import override, overload
 from cytoolz.itertoolz import get as cyget  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 D = TypeVar('D')
 K = TypeVar('K')
 V = TypeVar('V')
-
-_missing = object()
 
 
 class _get_meta(type):
@@ -34,8 +33,8 @@ class _get_meta(type):
     def __call__(ind: K, seq: Mapping[K, V], default: D) -> V | D: ...
     @staticmethod
     @override
-    def __call__(ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, _missing)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer]
-        if default is _missing:
+    def __call__(ind: int | list[int] | K, seq: Sequence[T] | Mapping[K, V], default: D = cast(D, no_default)) -> T | list[T] | V | T | D:  # pyright: ignore[reportCallInDefaultInitializer]
+        if default is no_default:
             return cyget(ind, seq)  # pyright: ignore[reportUnknownVariableType]
         return cyget(ind, seq, default)  # pyright: ignore[reportUnknownVariableType]
 

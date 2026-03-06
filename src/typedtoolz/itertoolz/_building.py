@@ -7,12 +7,11 @@ from cytoolz.itertoolz import (
     concat as cyconcat, concatv as cyconcatv, mapcat as cymapcat,  # pyright: ignore[reportUnknownVariableType]
 )
 from typedtoolz.functoolz._curry import curry
+from typedtoolz.utils import no_default
 
 T = TypeVar('T')
 A = TypeVar('A')
 R = TypeVar('R')
-
-_missing = object()
 
 
 class _remove_meta(type):
@@ -45,8 +44,8 @@ class _accumulate_meta(type):
     def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A) -> Iterator[A]: ...
     @staticmethod
     @override
-    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, _missing)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer]
-        if initial is _missing:
+    def __call__(binop: Callable[[A, T], A], seq: Iterable[T], initial: A = cast(A, no_default)) -> Iterator[A]:  # pyright: ignore[reportCallInDefaultInitializer]
+        if initial is no_default:
             return cyaccumulate(binop, seq)  # type: ignore[arg-type, return-value]  # pyright: ignore[reportUnknownVariableType]
         return cyaccumulate(binop, seq, initial)  # type: ignore[arg-type]  # pyright: ignore[reportUnknownVariableType]
 

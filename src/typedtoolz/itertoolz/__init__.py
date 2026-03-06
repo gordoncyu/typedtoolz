@@ -1,3 +1,4 @@
+from typedtoolz.utils import no_default
 from ._map import map
 from ._takewhile_acc import takewhile_acc
 from ._element_access import first, second, nth, last, rest, peek, peekn
@@ -13,6 +14,7 @@ from ._sorting import merge_sorted, topk
 from ._statistics import random_sample
 
 __all__ = [
+        "no_default",
         "map",
         "takewhile_acc",
         "first",
