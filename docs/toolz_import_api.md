@@ -113,9 +113,7 @@ Comparison of typedtoolz's import API against the combined middle and left colum
 | `export`          | `new in typedtoolz`                                                        | `definition moved`                                  | `not in typedtoolz`                      | `absent` |
 | ----------------- | -------------------------------------------------------------------------- | --------------------------------------------------- | ---------------------------------------- | -------- |
 | `cons`            |                                                                            |                                                     | `i:toolz.sandbox.core.cons`              |          |
-| `EqualityHashKey` |                                                                            | `toolz.sandbox.core → typedtoolz.sandbox`           | `toolz.sandbox.core.EqualityHashKey`     |          |
 | `excepts`         | `typedtoolz.functoolz.exceptions.excepts`                                  | `toolz.functoolz → typedtoolz.functoolz.exceptions` |                                          |          |
-| `fold`            |                                                                            | `toolz.sandbox.parallel → typedtoolz.sandbox`       | `toolz.sandbox.parallel.fold`            |          |
 | `getter`          |                                                                            |                                                     | `i:toolz.sandbox.core.getter`            | x        |
 | `map`             | `typedtoolz.itertoolz.map`                                                 | `builtins → typedtoolz.itertoolz`                   |                                          |          |
 | `no_default`      | `i:typedtoolz.functoolz.no_default`<br>`i:typedtoolz.itertoolz.no_default` |                                                     | `i:toolz.sandbox.parallel.no_default`    |          |
@@ -125,6 +123,5 @@ Comparison of typedtoolz's import API against the combined middle and left colum
 | `reduce`          | `typedtoolz.functoolz.reduce`                                              | `functools → typedtoolz.functoolz`                  |                                          |          |
 | `starmap`         |                                                                            |                                                     | `i:toolz.sandbox.core.starmap`           | x        |
 | `tee`             |                                                                            |                                                     | `i:toolz.sandbox.core.tee`               | x        |
-| `unzip`           |                                                                            | `toolz.sandbox.core → typedtoolz.sandbox`           | `toolz.sandbox.core.unzip`               |          |
 | `zip`             |                                                                            |                                                     |                                          | x        |
 | `zip_longest`     |                                                                            |                                                     |                                          | x        |
