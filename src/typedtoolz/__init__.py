@@ -40,6 +40,7 @@ from typedtoolz.recipes import countby, partitionby
 from typedtoolz.functoolz import (
     excepts, reduce, pipe, curry, compose, compose_left,
     thread_first, thread_last, memoize, juxt, do, flip, complement, apply,
+    star, unstar,
 )
 from typedtoolz.itertoolz import (
     map, first, second, nth, last, peek, peekn,
