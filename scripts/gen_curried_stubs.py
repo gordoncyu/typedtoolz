@@ -13,20 +13,38 @@ Each __call__ overload returns either:
     • itself (when called with no args)
 
 Usage:
-    python gen_curried_stubs.py 10 > _curried.pyi
+    python gen_curried_stubs.py [MAX [PRE]] > _curried.pyi
+
+    MAX  – max function arity tracked (default 10)
+    PRE  – max positional args that can be pre-applied on the curry() call
+           itself (default MAX // 2)
 """
 from __future__ import annotations
 import sys
 
 MAX = int(sys.argv[1]) if len(sys.argv) > 1 else 10
+PRE = int(sys.argv[2]) if len(sys.argv) > 2 else MAX // 2
 
 
 def tv(i: int) -> str:
     return f"A{i}"
 
 
+def ret_fixed_cls(remaining: int) -> str:
+    return "Curried0" if remaining == 0 else f"CurriedFixed{remaining}"
+
+
+def ret_fixed_gens(start: int, end: int) -> str:
+    """Type params for CurriedFixed(end-start) or Curried0 return type."""
+    parts = [tv(i) for i in range(start + 1, end + 1)]
+    # Curried0 now takes P; CurriedFixedN does not
+    if end == start:
+        return "P, R"
+    return ", ".join(parts + ["R"])
+
+
 # ── header ────────────────────────────────────────────────────────────
-print("from typing import Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, overload\n")
+print("from typing import Any, Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, overload\n")
 
 print("P = ParamSpec('P')")
 print("R = TypeVar('R', covariant=True)")
@@ -37,7 +55,6 @@ print()
 
 # ── emit protocols ────────────────────────────────────────────────────
 def emit_curried(n: int, fixed_only: bool) -> None:
-    # type-var lists
     fixed = [tv(i) for i in range(1, n + 1)]
     gens  = fixed + ([] if fixed_only else ["P"]) + ["R"]
     cls   = f"Curried{'Fixed' if fixed_only else ''}{n}"
@@ -64,9 +81,9 @@ def emit_curried(n: int, fixed_only: bool) -> None:
     print(f"    def __call__(self) -> '{cls}[{full_gens}]': ...\n")
 
 
-# Curried0 – no positional args, no ParamSpec (callers may not pass anything)
-print("class Curried0(Protocol[R]):")
-print("    def __call__(self) -> R: ...\n")
+# Curried0 – no positional args remaining; P carries through kwargs
+print("class Curried0(Protocol[P, R]):")
+print("    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R: ...\n")
 
 for arity in range(1, MAX + 1):
     emit_curried(arity, fixed_only=False)  # CurriedN
@@ -74,27 +91,46 @@ for arity in range(1, MAX + 1):
 
 
 # ── _CurryFixedNMaker protocols (returned by curry(n)) ────────────────
+KW_IGNORE = "  # pyright: ignore[reportExplicitAny, reportAny]"
+
 for n in range(1, MAX + 1):
-    params     = ", ".join(tv(i) for i in range(1, n + 1))
-    fixed_gens = ", ".join([*params.split(", "), "R"])
+    pre_n = min(PRE, n)
+    fn_params = ", ".join(tv(i) for i in range(1, n + 1))
+    fn_type = f"Callable[Concatenate[{fn_params}, P], R]"
     print(f"class _CurryFixed{n}Maker(Protocol):")
-    print(f"    def __call__(self, fn: Callable[Concatenate[{params}, P], R], /) -> CurriedFixed{n}[{fixed_gens}]: ...\n")
+    # emit overloads from most pre-applied to least; use @overload only if >1 variant
+    use_overload = pre_n > 0
+    for k in range(pre_n, -1, -1):
+        pre_args = ("".join(f", {tv(i)}: {tv(i)}" for i in range(1, k + 1))) if k > 0 else ""
+        cls = ret_fixed_cls(n - k)
+        gens = ret_fixed_gens(k, n)
+        if use_overload:
+            print("    @overload")
+        print(f"    def __call__(self, fn: {fn_type}{pre_args}, /, **kwargs: Any) -> {cls}[{gens}]: ...{KW_IGNORE}")
+    print()
 
 
 # ── curry(fn) overloads (point to CurriedN, inferred arity) ───────────
+# For each function arity N, emit k=min(PRE,N) down to k=0 pre-applied args.
 for n in range(MAX, 0, -1):
-    params = ", ".join(tv(i) for i in range(1, n + 1))
-    gener  = ", ".join([*params.split(", "), "P", "R"])
-    print("@overload")
-    print(
-        f"def curry(fn: Callable[Concatenate[{params}, P], R], /) -> Curried{n}[{gener}]: ...\n"
-    )
+    fn_params = ", ".join(tv(i) for i in range(1, n + 1))
+    fn_type = f"Callable[Concatenate[{fn_params}, P], R]"
+    pre_n = min(PRE, n)
+    for k in range(pre_n, -1, -1):
+        pre_args = ("".join(f", {tv(i)}: {tv(i)}" for i in range(1, k + 1))) if k > 0 else ""
+        if k < n:
+            remaining = [tv(i) for i in range(k + 1, n + 1)]
+            ret = f"Curried{n - k}[{', '.join(remaining + ['P', 'R'])}]"
+        else:
+            ret = "Curried0[P, R]"
+        print("@overload")
+        print(f"def curry(fn: {fn_type}{pre_args}, /, **kwargs: Any) -> {ret}: ...{KW_IGNORE}\n")
 
+# 0-arity function (no pre-application possible)
 print("@overload")
-print("def curry(fn: Callable[[], R], /) -> Curried0[R]: ...\n")
+print(f"def curry(fn: Callable[P, R], /, **kwargs: Any) -> Curried0[P, R]: ...{KW_IGNORE}\n")
 
 # ── curry(pn) overloads (return maker that takes fn) ──────────────────
 for n in range(MAX, 0, -1):
     print("@overload")
     print(f"def curry(pn: Literal[{n}], /) -> _CurryFixed{n}Maker: ...\n")
-

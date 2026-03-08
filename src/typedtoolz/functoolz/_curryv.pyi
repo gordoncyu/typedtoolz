@@ -1,7 +1,6 @@
-from typing import Any, Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, TypeVarTuple, Unpack, overload
+from typing import Any, Callable, Concatenate, Literal, ParamSpec, Protocol, TypeVar, overload
 
 P = ParamSpec('P')
-Ts = TypeVarTuple('Ts')
 R = TypeVar('R', covariant=True)
 A1 = TypeVar('A1', contravariant=True)
 A2 = TypeVar('A2', contravariant=True)
@@ -14,6 +13,9 @@ A8 = TypeVar('A8', contravariant=True)
 A9 = TypeVar('A9', contravariant=True)
 A10 = TypeVar('A10', contravariant=True)
 
+class CurriedV0(Protocol[P, R]):
+    def __call__(self, *args: P.args, **kwargs: P.kwargs) -> R: ...
+
 class CurriedV1(Protocol[A1, P, R]):
     @overload
     def __call__(self, A1: A1, *args: P.args, **kw: P.kwargs) -> R: ...
@@ -21,12 +23,6 @@ class CurriedV1(Protocol[A1, P, R]):
     def __call__(self) -> 'CurriedV1[A1, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV1[A1, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV1(Protocol[A1, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV1[A1, *Ts, R]': ...
 
 class CurriedV2(Protocol[A1, A2, P, R]):
     @overload
@@ -37,14 +33,6 @@ class CurriedV2(Protocol[A1, A2, P, R]):
     def __call__(self) -> 'CurriedV2[A1, A2, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV2[A1, A2, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV2(Protocol[A1, A2, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV1[A2, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV2[A1, A2, *Ts, R]': ...
 
 class CurriedV3(Protocol[A1, A2, A3, P, R]):
     @overload
@@ -57,16 +45,6 @@ class CurriedV3(Protocol[A1, A2, A3, P, R]):
     def __call__(self) -> 'CurriedV3[A1, A2, A3, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV3[A1, A2, A3, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV3(Protocol[A1, A2, A3, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV2[A2, A3, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV1[A3, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV3[A1, A2, A3, *Ts, R]': ...
 
 class CurriedV4(Protocol[A1, A2, A3, A4, P, R]):
     @overload
@@ -81,18 +59,6 @@ class CurriedV4(Protocol[A1, A2, A3, A4, P, R]):
     def __call__(self) -> 'CurriedV4[A1, A2, A3, A4, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV4[A1, A2, A3, A4, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV4(Protocol[A1, A2, A3, A4, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV3[A2, A3, A4, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV2[A3, A4, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV1[A4, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV4[A1, A2, A3, A4, *Ts, R]': ...
 
 class CurriedV5(Protocol[A1, A2, A3, A4, A5, P, R]):
     @overload
@@ -109,20 +75,6 @@ class CurriedV5(Protocol[A1, A2, A3, A4, A5, P, R]):
     def __call__(self) -> 'CurriedV5[A1, A2, A3, A4, A5, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV5[A1, A2, A3, A4, A5, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV5(Protocol[A1, A2, A3, A4, A5, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV4[A2, A3, A4, A5, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV3[A3, A4, A5, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV2[A4, A5, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV1[A5, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV5[A1, A2, A3, A4, A5, *Ts, R]': ...
 
 class CurriedV6(Protocol[A1, A2, A3, A4, A5, A6, P, R]):
     @overload
@@ -141,22 +93,6 @@ class CurriedV6(Protocol[A1, A2, A3, A4, A5, A6, P, R]):
     def __call__(self) -> 'CurriedV6[A1, A2, A3, A4, A5, A6, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV6[A1, A2, A3, A4, A5, A6, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV6(Protocol[A1, A2, A3, A4, A5, A6, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV5[A2, A3, A4, A5, A6, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV4[A3, A4, A5, A6, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV3[A4, A5, A6, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV2[A5, A6, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /) -> CurriedFixedV1[A6, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV6[A1, A2, A3, A4, A5, A6, *Ts, R]': ...
 
 class CurriedV7(Protocol[A1, A2, A3, A4, A5, A6, A7, P, R]):
     @overload
@@ -177,24 +113,6 @@ class CurriedV7(Protocol[A1, A2, A3, A4, A5, A6, A7, P, R]):
     def __call__(self) -> 'CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV7(Protocol[A1, A2, A3, A4, A5, A6, A7, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV6[A2, A3, A4, A5, A6, A7, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV5[A3, A4, A5, A6, A7, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV4[A4, A5, A6, A7, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV3[A5, A6, A7, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /) -> CurriedFixedV2[A6, A7, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, /) -> CurriedFixedV1[A7, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV7[A1, A2, A3, A4, A5, A6, A7, *Ts, R]': ...
 
 class CurriedV8(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, P, R]):
     @overload
@@ -217,26 +135,6 @@ class CurriedV8(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, P, R]):
     def __call__(self) -> 'CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV8(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV7[A2, A3, A4, A5, A6, A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV6[A3, A4, A5, A6, A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV5[A4, A5, A6, A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV4[A5, A6, A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /) -> CurriedFixedV3[A6, A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, /) -> CurriedFixedV2[A7, A8, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, /) -> CurriedFixedV1[A8, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV8[A1, A2, A3, A4, A5, A6, A7, A8, *Ts, R]': ...
 
 class CurriedV9(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]):
     @overload
@@ -261,28 +159,6 @@ class CurriedV9(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]):
     def __call__(self) -> 'CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]': ...
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
-
-class CurriedFixedV9(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, A9: A9, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV8[A2, A3, A4, A5, A6, A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV7[A3, A4, A5, A6, A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV6[A4, A5, A6, A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV5[A5, A6, A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /) -> CurriedFixedV4[A6, A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, /) -> CurriedFixedV3[A7, A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, /) -> CurriedFixedV2[A8, A9, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, /) -> CurriedFixedV1[A9, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, *Ts, R]': ...
 
 class CurriedV10(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]):
     @overload
@@ -310,59 +186,125 @@ class CurriedV10(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]):
     @overload
     def __call__(self, **kw: Any) -> 'CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]': ...  # pyright: ignore[reportAny, reportExplicitAny]
 
-class CurriedFixedV10(Protocol[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts, R]):
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, A9: A9, A10: A10, *xs: Unpack[Ts]) -> R: ...
-    @overload
-    def __call__(self, A1: A1, /) -> CurriedFixedV9[A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, /) -> CurriedFixedV8[A3, A4, A5, A6, A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, /) -> CurriedFixedV7[A4, A5, A6, A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, /) -> CurriedFixedV6[A5, A6, A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /) -> CurriedFixedV5[A6, A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, /) -> CurriedFixedV4[A7, A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, /) -> CurriedFixedV3[A8, A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, /) -> CurriedFixedV2[A9, A10, *Ts, R]: ...
-    @overload
-    def __call__(self, A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, A6: A6, A7: A7, A8: A8, A9: A9, /) -> CurriedFixedV1[A10, *Ts, R]: ...
-    @overload
-    def __call__(self) -> 'CurriedFixedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, *Ts, R]': ...
-
 class _CurryV1Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, P], R], /) -> CurriedV1[A1, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, P], R], A1: A1, /, **kwargs: Any) -> CurriedV0[P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, P], R], /, **kwargs: Any) -> CurriedV1[A1, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV2Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, P], R], /) -> CurriedV2[A1, A2, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV0[P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, P], R], A1: A1, /, **kwargs: Any) -> CurriedV1[A2, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, P], R], /, **kwargs: Any) -> CurriedV2[A1, A2, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV3Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, P], R], /) -> CurriedV3[A1, A2, A3, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV0[P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV1[A3, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, P], R], A1: A1, /, **kwargs: Any) -> CurriedV2[A2, A3, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, P], R], /, **kwargs: Any) -> CurriedV3[A1, A2, A3, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV4Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], /) -> CurriedV4[A1, A2, A3, A4, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV0[P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV1[A4, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV2[A3, A4, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], A1: A1, /, **kwargs: Any) -> CurriedV3[A2, A3, A4, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, P], R], /, **kwargs: Any) -> CurriedV4[A1, A2, A3, A4, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV5Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], /) -> CurriedV5[A1, A2, A3, A4, A5, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV0[P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV1[A5, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV2[A4, A5, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV3[A3, A4, A5, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], A1: A1, /, **kwargs: Any) -> CurriedV4[A2, A3, A4, A5, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, P], R], /, **kwargs: Any) -> CurriedV5[A1, A2, A3, A4, A5, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV6Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], /) -> CurriedV6[A1, A2, A3, A4, A5, A6, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV1[A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV2[A5, A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV3[A4, A5, A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV4[A3, A4, A5, A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], A1: A1, /, **kwargs: Any) -> CurriedV5[A2, A3, A4, A5, A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, P], R], /, **kwargs: Any) -> CurriedV6[A1, A2, A3, A4, A5, A6, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV7Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], /) -> CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV2[A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV3[A5, A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV4[A4, A5, A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV5[A3, A4, A5, A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], A1: A1, /, **kwargs: Any) -> CurriedV6[A2, A3, A4, A5, A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, P], R], /, **kwargs: Any) -> CurriedV7[A1, A2, A3, A4, A5, A6, A7, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV8Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], /) -> CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV3[A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV4[A5, A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV5[A4, A5, A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV6[A3, A4, A5, A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], A1: A1, /, **kwargs: Any) -> CurriedV7[A2, A3, A4, A5, A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, P], R], /, **kwargs: Any) -> CurriedV8[A1, A2, A3, A4, A5, A6, A7, A8, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV9Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], /) -> CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV4[A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV5[A5, A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV6[A4, A5, A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV7[A3, A4, A5, A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], A1: A1, /, **kwargs: Any) -> CurriedV8[A2, A3, A4, A5, A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, P], R], /, **kwargs: Any) -> CurriedV9[A1, A2, A3, A4, A5, A6, A7, A8, A9, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 class _CurryV10Maker(Protocol):
-    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], /) -> CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]: ...
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], A1: A1, A2: A2, A3: A3, A4: A4, A5: A5, /, **kwargs: Any) -> CurriedV5[A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], A1: A1, A2: A2, A3: A3, A4: A4, /, **kwargs: Any) -> CurriedV6[A5, A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], A1: A1, A2: A2, A3: A3, /, **kwargs: Any) -> CurriedV7[A4, A5, A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], A1: A1, A2: A2, /, **kwargs: Any) -> CurriedV8[A3, A4, A5, A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], A1: A1, /, **kwargs: Any) -> CurriedV9[A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
+    @overload
+    def __call__(self, f: Callable[Concatenate[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P], R], /, **kwargs: Any) -> CurriedV10[A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, P, R]: ...  # pyright: ignore[reportAny, reportExplicitAny]
 
 @overload
 def curryv(pn: Literal[10], /) -> _CurryV10Maker: ...
