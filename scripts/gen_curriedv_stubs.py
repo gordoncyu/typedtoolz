@@ -81,20 +81,9 @@ for n in range(1, MAX + 1):
     print(f"class _CurryV{n}Maker(Protocol):")
     print(f"    def __call__(self, f: Callable[Concatenate[{prefix}, P], R], /) -> CurriedV{n}[{gen}]: ...\n")
 
-# ─── curryv(n, f) overloads ────────────────────────────────────────────
-for n in range(MAX, 0, -1):
-    ltrs = letters(n)
-    prefix = ", ".join(ltrs)
-    gen    = ", ".join(ltrs + ["P", "R"])
-    print("@overload")
-    print(
-        f"def curryv(pn: Literal[{n}], f: Callable[Concatenate[{prefix}, P], R], /) -> CurriedV{n}[{gen}]: ...\n"
-    )
-
 # ─── curryv(n) overloads (return maker that takes f) ──────────────────
 for n in range(MAX, 0, -1):
     print("@overload")
     print(f"def curryv(pn: Literal[{n}], /) -> _CurryV{n}Maker: ...\n")
 
-print("@overload\ndef curryv(pn: int, f: Callable[..., R], /) -> Callable[..., R]: ...")
 

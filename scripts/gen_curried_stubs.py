@@ -86,15 +86,6 @@ for n in range(MAX, 0, -1):
         f"def curry(fn: Callable[Concatenate[{params}, P], R], /) -> Curried{n}[{gener}]: ...\n"
     )
 
-# ── curry(pn, fn) overloads (point to CurriedFixedN, rest hidden) ─────
-for n in range(MAX, 0, -1):
-    params     = ", ".join(tv(i) for i in range(1, n + 1))
-    fixed_gens = ", ".join([*params.split(", "), "R"])
-    print("@overload")
-    print(
-        f"def curry(pn: Literal[{n}], fn: Callable[Concatenate[{params}, P], R], /) -> CurriedFixed{n}[{fixed_gens}]: ...\n"
-    )
-
 # ── curry(pn) overloads (return maker that takes fn) ──────────────────
 for n in range(MAX, 0, -1):
     print("@overload")
