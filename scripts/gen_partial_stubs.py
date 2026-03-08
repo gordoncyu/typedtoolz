@@ -40,3 +40,8 @@ for n in range(MAX, 0, -1):
     print("@overload")
     print(f"def partial(func: {func_type}, {args}, /, **kwargs: Any) -> Callable[P, R]: ...  # pyright: ignore[reportExplicitAny, reportAny]")
     print()
+
+# ── 0 positional args (kwargs only) ────────────────────────────────────
+print("@overload")
+print("def partial(func: Callable[P, R], /, **kwargs: Any) -> Callable[P, R]: ...  # pyright: ignore[reportExplicitAny, reportAny]")
+print()

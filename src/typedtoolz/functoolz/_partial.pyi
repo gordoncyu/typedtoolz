@@ -44,3 +44,6 @@ def partial(func: Callable[Concatenate[A1, A2, P], R], __a1: A1, __a2: A2, /, **
 @overload
 def partial(func: Callable[Concatenate[A1, P], R], __a1: A1, /, **kwargs: Any) -> Callable[P, R]: ...  # pyright: ignore[reportExplicitAny, reportAny]
 
+@overload
+def partial(func: Callable[P, R], /, **kwargs: Any) -> Callable[P, R]: ...  # pyright: ignore[reportExplicitAny, reportAny]
+
