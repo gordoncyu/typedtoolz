@@ -102,7 +102,7 @@ class TypeImplication:
     lc_req_pos: frozenset[int]         # required positional indices; all must be in the final call
     lc_opt_pos: frozenset[int]         # optional positional indices; all must be in the final call
     return_type: str | None            # None = no override for return type
-    # future: args: dict[str, str] | None = None
+    args: dict[str, str]               # arg name → annotation override (requires last_call)
 
 
 @dataclass
@@ -329,6 +329,19 @@ def load_spec(yaml_path: str) -> CurrySpec:
         wk, wp = _parse_when_names(rule.get("when", []), "when")
         nk, np_ = _parse_not_names(rule.get("not", []))
         lck, lcrp, lcop = _parse_last_call_names(rule.get("last_call", []))
+        rule_args: dict[str, str] = rule.get("args", {})
+        has_last_call = bool(lck or lcrp or lcop)
+        if rule_args and not has_last_call:
+            raise ValueError(
+                "type_implications 'args' requires 'last_call' to be non-empty"
+            )
+        all_arg_names = {a.name for a in args}
+        for arg_name in rule_args:
+            if arg_name not in all_arg_names:
+                raise ValueError(
+                    f"type_implications 'args' contains '{arg_name}' which is not "
+                    f"a parameter of the function"
+                )
         implications.append(TypeImplication(
             when_keywords=wk,
             when_positionals=wp,
@@ -338,6 +351,7 @@ def load_spec(yaml_path: str) -> CurrySpec:
             lc_req_pos=lcrp,
             lc_opt_pos=lcop,
             return_type=rule.get("return_type", None),
+            args=rule_args,
         ))
 
     resolved_name = output_name if output_name else name_parts[-1]
@@ -439,8 +453,10 @@ def generate(spec: CurrySpec) -> str:
         kw_provided: list[ArgSlot],
         include_untracked: bool,
         force_kw_tracked: bool,
+        arg_overrides: dict[str, str] | None = None,
     ) -> str:
         parts: list[str] = []
+        ovr = arg_overrides or {}
 
         has_pos_only = False
         last_pos_only_idx = -1
@@ -448,7 +464,8 @@ def generate(spec: CurrySpec) -> str:
             if arg.is_pos_only:
                 has_pos_only = True
                 last_pos_only_idx = len(parts)
-            parts.append(f"{arg.name}: {arg.annotation_str}")
+            ann = ovr.get(arg.name, arg.annotation_str)
+            parts.append(f"{arg.name}: {ann}")
 
         if has_pos_only:
             parts.insert(last_pos_only_idx + 1, "/")
@@ -467,7 +484,8 @@ def generate(spec: CurrySpec) -> str:
             if need_star:
                 parts.append("*")
             for arg in kw_args:
-                parts.append(f"{arg.name}: {arg.annotation_str} = ...")
+                ann = ovr.get(arg.name, arg.annotation_str)
+                parts.append(f"{arg.name}: {ann} = ...")
 
         return ", ".join(parts)
 
@@ -486,13 +504,14 @@ def generate(spec: CurrySpec) -> str:
             for other in others
         )
 
-    def _resolve_return_type(
+    def _resolve_implications(
         provided_pos: frozenset[int],
         S: frozenset[int],
         lc_req_pos: frozenset[int],
         lc_opt_pos: frozenset[int],
         lc_kw: frozenset[int],
-    ) -> str:
+    ) -> tuple[str, dict[str, str]]:
+        """Returns (return_type, arg_overrides) for the winning implication."""
         matching = [
             (i, impl) for i, impl in enumerate(spec.implications)
             if not (impl.not_keywords & S) and not (impl.not_positionals & provided_pos)
@@ -502,7 +521,7 @@ def generate(spec: CurrySpec) -> str:
             and impl.lc_opt_pos <= lc_opt_pos
         ]
         if not matching:
-            return func.return_annotation_str
+            return func.return_annotation_str, {}
         matching_impls = [impl for _, impl in matching]
         # Discard rules dominated by any other matching rule
         maximal = [
@@ -511,7 +530,8 @@ def generate(spec: CurrySpec) -> str:
         ]
         # Among maximal (incomparable) rules, take the last by original list index
         _, winner = max(maximal, key=lambda x: x[0])
-        return winner.return_type or func.return_annotation_str
+        ret = winner.return_type or func.return_annotation_str
+        return ret, winner.args
 
     # ------------------------------------------------------------------
     # Emit
@@ -556,8 +576,8 @@ def generate(spec: CurrySpec) -> str:
                         # All required satisfied → return type
                         lc_req = frozenset(range(n - k, n))
                         lc_opt = frozenset(range(p - k))
-                        ret = _resolve_return_type(frozenset(range(n)), ST, lc_req, lc_opt, T)
-                        params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
+                        ret, arg_ovr = _resolve_implications(frozenset(range(n)), ST, lc_req, lc_opt, T)
+                        params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False, arg_overrides=arg_ovr)
                         pr("    @overload")
                         pr(f"    def __call__(self{',' if params else ''} {params}) -> {ret}: ..." if params else f"    def __call__(self) -> {ret}: ...")
 
@@ -599,8 +619,8 @@ def generate(spec: CurrySpec) -> str:
             if p >= n:
                 lc_req = frozenset(range(n))
                 lc_opt = frozenset(range(p - n))
-                ret = _resolve_return_type(frozenset(range(n)), T, lc_req, lc_opt, T)
-                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
+                ret, arg_ovr = _resolve_implications(frozenset(range(n)), T, lc_req, lc_opt, T)
+                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False, arg_overrides=arg_ovr)
                 pr("@overload")
                 pr(f"def {fname}({params}) -> {ret}: ..." if params else f"def {fname}() -> {ret}: ...")
 
