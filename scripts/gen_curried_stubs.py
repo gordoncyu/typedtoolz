@@ -64,6 +64,10 @@ def emit_curried(n: int, fixed_only: bool) -> None:
     print(f"    def __call__(self) -> '{cls}[{full_gens}]': ...\n")
 
 
+# Curried0 – no positional args, no ParamSpec (callers may not pass anything)
+print("class Curried0(Protocol[R]):")
+print("    def __call__(self) -> R: ...\n")
+
 for arity in range(1, MAX + 1):
     emit_curried(arity, fixed_only=False)  # CurriedN
     emit_curried(arity, fixed_only=True)   # CurriedFixedN
@@ -85,6 +89,9 @@ for n in range(MAX, 0, -1):
     print(
         f"def curry(fn: Callable[Concatenate[{params}, P], R], /) -> Curried{n}[{gener}]: ...\n"
     )
+
+print("@overload")
+print("def curry(fn: Callable[[], R], /) -> Curried0[R]: ...\n")
 
 # ── curry(pn) overloads (return maker that takes fn) ──────────────────
 for n in range(MAX, 0, -1):

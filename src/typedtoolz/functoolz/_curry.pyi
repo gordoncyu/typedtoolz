@@ -13,6 +13,9 @@ A8 = TypeVar('A8', contravariant=True)
 A9 = TypeVar('A9', contravariant=True)
 A10 = TypeVar('A10', contravariant=True)
 
+class Curried0(Protocol[R]):
+    def __call__(self) -> R: ...
+
 class Curried1(Protocol[A1, P, R]):
     @overload
     def __call__(self, A1: A1, *args: P.args, **kw: P.kwargs) -> R: ...
@@ -372,6 +375,9 @@ def curry(fn: Callable[Concatenate[A1, A2, P], R], /) -> Curried2[A1, A2, P, R]:
 
 @overload
 def curry(fn: Callable[Concatenate[A1, P], R], /) -> Curried1[A1, P, R]: ...
+
+@overload
+def curry(fn: Callable[[], R], /) -> Curried0[R]: ...
 
 @overload
 def curry(pn: Literal[10], /) -> _CurryFixed10Maker: ...
