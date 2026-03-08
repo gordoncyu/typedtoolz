@@ -92,15 +92,30 @@ class FuncInfo:
 
 
 @dataclass
+class TypeImplication:
+    """One rule in the type_implications list."""
+    when_keywords: frozenset[int]      # indices into track_keywords; all must be in S
+    when_positionals: frozenset[int]   # indices into required positional args; all must be provided
+    not_keywords: frozenset[int]       # indices into track_keywords; none may be in S
+    not_positionals: frozenset[int]    # indices into opt_pos args; none may be provided
+    lc_keywords: frozenset[int]        # tracked keyword indices; all must be in the final call's T
+    lc_req_pos: frozenset[int]         # required positional indices; all must be in the final call
+    lc_opt_pos: frozenset[int]         # optional positional indices; all must be in the final call
+    return_type: str | None            # None = no override for return type
+    # future: args: dict[str, str] | None = None
+
+
+@dataclass
 class CurrySpec:
     """Everything needed to generate curried stubs."""
     func: FuncInfo
     preamble: str
-    n: int                     # positional-only required (for currying)
-    m: int                     # positional-only optional (for currying)
-    track_keywords: list[str]  # keyword args that create combinatorial variants
-    provided_names: list[str]  # display names for tracked keywords
-    output_name: str | None    # override function name in generated output
+    n: int                          # positional-only required (for currying)
+    m: int                          # positional-only optional (for currying)
+    track_keywords: list[str]       # keyword args that create combinatorial variants
+    provided_names: list[str]       # display names for tracked keywords
+    output_name: str | None         # override function name in generated output
+    implications: list[TypeImplication]  # type implication rules, later = higher priority
 
 
 # ---------------------------------------------------------------------------
@@ -193,6 +208,8 @@ def load_spec(yaml_path: str) -> CurrySpec:
     provided_names: list[str] = raw.get("provided_names", [])
     output_name: str | None = raw.get("output_name", None)
 
+    track_set = set(track_keywords)
+
     decl_path = (yaml_file.parent / declaration_file).resolve()
     source = decl_path.read_text()
     tree = ast.parse(source)
@@ -238,6 +255,91 @@ def load_spec(yaml_path: str) -> CurrySpec:
     ret_typevars = _enumerate_typevars(hints.get("return"))
     ret_str = _ann_str(func_node.returns)
 
+    required_names = [a.name for a in args[:n]]
+    required_name_set = set(required_names)
+    opt_pos_names = [a.name for a in args[n : n + m]]
+    opt_pos_name_set = set(opt_pos_names)
+
+    def _parse_when_names(names: list[str], field: str) -> tuple[frozenset[int], frozenset[int]]:
+        kw_indices: list[int] = []
+        pos_indices: list[int] = []
+        for name in names:
+            if name == "/all_req_pos":
+                pos_indices.extend(range(n))
+            elif name == "/all_key_opt":
+                kw_indices.extend(range(len(track_keywords)))
+            elif name in track_set:
+                kw_indices.append(track_keywords.index(name))
+            elif name in required_name_set:
+                pos_indices.append(required_names.index(name))
+            else:
+                raise ValueError(
+                    f"type_implications '{field}' contains '{name}' which is not in "
+                    f"track_keywords, required positional args, /all_req_pos, or /all_key_opt"
+                )
+        return frozenset(kw_indices), frozenset(pos_indices)
+
+    def _parse_not_names(names: list[str]) -> tuple[frozenset[int], frozenset[int]]:
+        kw_indices: list[int] = []
+        pos_indices: list[int] = []
+        for name in names:
+            if name == "/all_opt_pos":
+                pos_indices.extend(range(m))
+            elif name == "/all_key_opt":
+                kw_indices.extend(range(len(track_keywords)))
+            elif name in track_set:
+                kw_indices.append(track_keywords.index(name))
+            elif name in opt_pos_name_set:
+                pos_indices.append(opt_pos_names.index(name))
+            else:
+                raise ValueError(
+                    f"type_implications 'not' contains '{name}' which is not in "
+                    f"track_keywords, optional positional args, /all_opt_pos, or /all_key_opt"
+                )
+        return frozenset(kw_indices), frozenset(pos_indices)
+
+    def _parse_last_call_names(names: list[str]) -> tuple[frozenset[int], frozenset[int], frozenset[int]]:
+        kw_indices: list[int] = []
+        req_pos_indices: list[int] = []
+        opt_pos_indices: list[int] = []
+        for name in names:
+            if name == "/all_req_pos":
+                req_pos_indices.extend(range(n))
+            elif name == "/all_opt_pos":
+                opt_pos_indices.extend(range(m))
+            elif name == "/all_key_opt":
+                kw_indices.extend(range(len(track_keywords)))
+            elif name in track_set:
+                kw_indices.append(track_keywords.index(name))
+            elif name in required_name_set:
+                req_pos_indices.append(required_names.index(name))
+            elif name in opt_pos_name_set:
+                opt_pos_indices.append(opt_pos_names.index(name))
+            else:
+                raise ValueError(
+                    f"type_implications 'last_call' contains '{name}' which is not in "
+                    f"track_keywords, required positional args, optional positional args, "
+                    f"/all_req_pos, /all_opt_pos, or /all_key_opt"
+                )
+        return frozenset(kw_indices), frozenset(req_pos_indices), frozenset(opt_pos_indices)
+
+    raw_implications: list[dict] = raw.get("type_implications", [])
+    implications: list[TypeImplication] = []
+    for rule in raw_implications:
+        wk, wp = _parse_when_names(rule.get("when", []), "when")
+        nk, np_ = _parse_not_names(rule.get("not", []))
+        lck, lcrp, lcop = _parse_last_call_names(rule.get("last_call", []))
+        implications.append(TypeImplication(
+            when_keywords=wk,
+            when_positionals=wp,
+            not_keywords=nk,
+            not_positionals=np_,
+            lc_keywords=lck,
+            lc_req_pos=lcrp,
+            lc_opt_pos=lcop,
+            return_type=rule.get("return_type", None),
+        ))
+
     resolved_name = output_name if output_name else name_parts[-1]
 
     return CurrySpec(
@@ -252,6 +354,7 @@ def load_spec(yaml_path: str) -> CurrySpec:
         track_keywords=track_keywords,
         provided_names=provided_names,
         output_name=resolved_name,
+        implications=implications,
     )
 
 
@@ -369,6 +472,48 @@ def generate(spec: CurrySpec) -> str:
         return ", ".join(parts)
 
     # ------------------------------------------------------------------
+    # Return type resolution with implication precedence
+    #
+    # Precedence: if rule B's `when` is a proper superset of rule A's `when`,
+    # B takes precedence (more specific wins). Among incomparable maximal rules,
+    # the last in list order wins.
+    # ------------------------------------------------------------------
+
+    def _rule_dominated(impl: TypeImplication, others: list[TypeImplication]) -> bool:
+        return any(
+            impl.when_keywords < other.when_keywords and impl.when_positionals <= other.when_positionals
+            or impl.when_keywords <= other.when_keywords and impl.when_positionals < other.when_positionals
+            for other in others
+        )
+
+    def _resolve_return_type(
+        provided_pos: frozenset[int],
+        S: frozenset[int],
+        lc_req_pos: frozenset[int],
+        lc_opt_pos: frozenset[int],
+        lc_kw: frozenset[int],
+    ) -> str:
+        matching = [
+            (i, impl) for i, impl in enumerate(spec.implications)
+            if not (impl.not_keywords & S) and not (impl.not_positionals & provided_pos)
+            and impl.when_keywords <= S and impl.when_positionals <= provided_pos
+            and impl.lc_keywords <= lc_kw
+            and impl.lc_req_pos <= lc_req_pos
+            and impl.lc_opt_pos <= lc_opt_pos
+        ]
+        if not matching:
+            return func.return_annotation_str
+        matching_impls = [impl for _, impl in matching]
+        # Discard rules dominated by any other matching rule
+        maximal = [
+            (i, impl) for i, impl in matching
+            if not _rule_dominated(impl, [other for other in matching_impls if other is not impl])
+        ]
+        # Among maximal (incomparable) rules, take the last by original list index
+        _, winner = max(maximal, key=lambda x: x[0])
+        return winner.return_type or func.return_annotation_str
+
+    # ------------------------------------------------------------------
     # Emit
     # ------------------------------------------------------------------
 
@@ -409,9 +554,12 @@ def generate(spec: CurrySpec) -> str:
 
                     if p >= k:
                         # All required satisfied → return type
+                        lc_req = frozenset(range(n - k, n))
+                        lc_opt = frozenset(range(p - k))
+                        ret = _resolve_return_type(frozenset(range(n)), ST, lc_req, lc_opt, T)
                         params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
                         pr("    @overload")
-                        pr(f"    def __call__(self{',' if params else ''} {params}) -> {func.return_annotation_str}: ..." if params else f"    def __call__(self) -> {func.return_annotation_str}: ...")
+                        pr(f"    def __call__(self{',' if params else ''} {params}) -> {ret}: ..." if params else f"    def __call__(self) -> {ret}: ...")
 
                     elif p > 0:
                         # Partial application → lower Protocol
@@ -449,9 +597,12 @@ def generate(spec: CurrySpec) -> str:
             tracked_provided = [tracked[i] for i in sorted(T)]
 
             if p >= n:
+                lc_req = frozenset(range(n))
+                lc_opt = frozenset(range(p - n))
+                ret = _resolve_return_type(frozenset(range(n)), T, lc_req, lc_opt, T)
                 params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
                 pr("@overload")
-                pr(f"def {fname}({params}) -> {func.return_annotation_str}: ..." if params else f"def {fname}() -> {func.return_annotation_str}: ...")
+                pr(f"def {fname}({params}) -> {ret}: ..." if params else f"def {fname}() -> {ret}: ...")
 
             elif p > 0:
                 tgt_k = n - p
@@ -500,6 +651,12 @@ m: 0   # positional-only optional args (for currying)
 #   - some_kwarg
 # provided_names:   # display names for tracked keywords (one per track_keywords entry)
 #   - SomeKwarg
+# type_implications:  # rules that change types based on which args are provided
+#   - when: []           # matches when all listed names are provided (keywords or required positionals)
+#     return_type: "A | None"
+#   - when: [some_kwarg]
+#     not: [some_opt_pos]  # excludes match if any listed name is provided (keywords or optional positionals)
+#     return_type: "A"
 """
 
 
