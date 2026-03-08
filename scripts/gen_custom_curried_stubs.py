@@ -6,6 +6,7 @@ Generate custom curried type stubs from a YAML specification.
 
 Usage:
     python scripts/gen_custom_curried_stubs.py spec.yaml > output.pyi
+    python scripts/gen_custom_curried_stubs.py --create-template <dir>
 """
 from __future__ import annotations
 
@@ -22,26 +23,47 @@ import yaml
 
 
 # ---------------------------------------------------------------------------
-# TypeVar detection
+# TypeVar enumeration (excludes TypeVarTuple / ParamSpec)
 # ---------------------------------------------------------------------------
-
-def _contains_typevar(tp: object) -> bool:
-    """Recursively check if a type annotation contains TypeVar/TypeVarTuple/ParamSpec."""
-    if isinstance(tp, typing.TypeVar):
-        return True
-    for mod in (typing, *([] if not _has_typing_extensions else [_typing_extensions])):
-        for attr in ("TypeVarTuple", "ParamSpec"):
-            cls = getattr(mod, attr, None)
-            if cls is not None and isinstance(tp, cls):
-                return True
-    return any(_contains_typevar(a) for a in typing.get_args(tp))
-
 
 try:
     import typing_extensions as _typing_extensions
     _has_typing_extensions = True
 except ImportError:
     _has_typing_extensions = False
+
+
+def _is_plain_typevar(tp: object) -> bool:
+    """True only for TypeVar, not TypeVarTuple or ParamSpec."""
+    if not isinstance(tp, typing.TypeVar):
+        return False
+    for mod in [typing] + ([_typing_extensions] if _has_typing_extensions else []):
+        for attr in ("TypeVarTuple", "ParamSpec"):
+            cls = getattr(mod, attr, None)
+            if cls is not None and isinstance(tp, cls):
+                return False
+    return True
+
+
+def _enumerate_typevars(tp: object, seen: set[str] | None = None) -> list[str]:
+    """Return ordered unique TypeVar names (plain only) found in a runtime annotation."""
+    if seen is None:
+        seen = set()
+    result: list[str] = []
+    if _is_plain_typevar(tp):
+        name = tp.__name__  # type: ignore[union-attr]
+        if name not in seen:
+            seen.add(name)
+            result.append(name)
+        return result
+    for arg in typing.get_args(tp):
+        # Callable[[A, B], R] gives get_args → ([A, B], R); the param list is a plain list
+        if isinstance(arg, (list, tuple)):
+            for item in arg:
+                result.extend(_enumerate_typevars(item, seen))
+        else:
+            result.extend(_enumerate_typevars(arg, seen))
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -52,12 +74,12 @@ except ImportError:
 class ArgSlot:
     """One parameter of the original function."""
     name: str
-    annotation_str: str       # source-level annotation string
-    has_typevars: bool         # annotation tree contains TypeVar/TypeVarTuple/ParamSpec
-    is_pos_only: bool          # positional-only in the ORIGINAL function
-    is_kw_only: bool           # keyword-only in the ORIGINAL function
-    has_default: bool          # has a default value
-    index: int                 # position in the full arg list (0-based)
+    annotation_str: str    # source-level annotation string
+    typevars: list[str]    # ordered TypeVar names appearing in annotation (plain only)
+    is_pos_only: bool      # positional-only in the original function
+    is_kw_only: bool       # keyword-only in the original function
+    has_default: bool      # has a default value
+    index: int             # position in full arg list (0-based)
 
 
 @dataclass
@@ -66,7 +88,7 @@ class FuncInfo:
     name: str
     args: list[ArgSlot]
     return_annotation_str: str
-    return_has_typevars: bool
+    return_typevars: list[str]
 
 
 @dataclass
@@ -74,11 +96,11 @@ class CurrySpec:
     """Everything needed to generate curried stubs."""
     func: FuncInfo
     preamble: str
-    n: int                        # positional-only required (for currying)
-    m: int                        # positional-only optional (for currying)
-    track_keywords: list[str]     # keyword args that create combinatorial variants
-    provided_names: list[str]     # display names for tracked keywords (len == len(track_keywords))
-    output_name: str | None       # override function name in generated output
+    n: int                     # positional-only required (for currying)
+    m: int                     # positional-only optional (for currying)
+    track_keywords: list[str]  # keyword args that create combinatorial variants
+    provided_names: list[str]  # display names for tracked keywords
+    output_name: str | None    # override function name in generated output
 
 
 # ---------------------------------------------------------------------------
@@ -92,22 +114,11 @@ def powerset(items: list[int]) -> list[tuple[int, ...]]:
     return result
 
 
-# Slot identity: ("arg", index) or ("return", -1)
-SlotId = tuple[str, int]
-
-
-def _slot_id(slot: ArgSlot | None) -> SlotId:
-    if slot is None:
-        return ("return", -1)
-    return ("arg", slot.index)
-
-
 # ---------------------------------------------------------------------------
 # Introspection / YAML loading
 # ---------------------------------------------------------------------------
 
 def _find_ast_func(tree: ast.Module, name_parts: list[str]) -> ast.FunctionDef:
-    """Find a function AST node by dotted name (e.g. ['MyClass', 'method'])."""
     node: ast.AST = tree
     for part in name_parts[:-1]:
         for child in ast.iter_child_nodes(node):
@@ -117,16 +128,14 @@ def _find_ast_func(tree: ast.Module, name_parts: list[str]) -> ast.FunctionDef:
         else:
             raise ValueError(f"Could not find class '{part}' in AST")
 
-    func_name = name_parts[-1]
     candidates: list[ast.FunctionDef] = []
     for child in ast.iter_child_nodes(node):
-        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name == func_name:
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)) and child.name == name_parts[-1]:
             candidates.append(child)  # type: ignore[arg-type]
 
     if not candidates:
-        raise ValueError(f"Could not find function '{func_name}'")
+        raise ValueError(f"Could not find function '{name_parts[-1]}'")
 
-    # Prefer the non-@overload definition
     for c in candidates:
         is_overload = any(
             (isinstance(d, ast.Name) and d.id == "overload")
@@ -192,7 +201,6 @@ def load_spec(yaml_path: str) -> CurrySpec:
     preamble = _extract_preamble(source, tree, name_parts)
     func_node = _find_ast_func(tree, name_parts)
 
-    # Runtime import for TypeVar detection
     module = _import_from_file(decl_path)
     runtime_obj = _resolve_obj(module, name_parts)
 
@@ -201,10 +209,8 @@ def load_spec(yaml_path: str) -> CurrySpec:
     except Exception:
         hints = {}
 
-    # Use inspect.signature for param kinds / defaults
     sig = inspect.signature(runtime_obj)  # type: ignore[arg-type]
 
-    # Build AST annotation map (param name -> source string)
     ast_args = func_node.args
     ast_ann: dict[str, str] = {}
     for arg_node in (*ast_args.posonlyargs, *ast_args.args, *ast_args.kwonlyargs):
@@ -217,10 +223,11 @@ def load_spec(yaml_path: str) -> CurrySpec:
             continue
         if param.name == "self":
             continue
+        tvars = _enumerate_typevars(hints.get(param.name))
         args.append(ArgSlot(
             name=param.name,
             annotation_str=ast_ann.get(param.name, "Any"),
-            has_typevars=_contains_typevar(hints.get(param.name)) if param.name in hints else False,
+            typevars=tvars,
             is_pos_only=param.kind == param.POSITIONAL_ONLY,
             is_kw_only=param.kind == param.KEYWORD_ONLY,
             has_default=param.default is not param.empty,
@@ -228,14 +235,18 @@ def load_spec(yaml_path: str) -> CurrySpec:
         ))
         idx += 1
 
+    ret_typevars = _enumerate_typevars(hints.get("return"))
     ret_str = _ann_str(func_node.returns)
-    ret_has_tv = _contains_typevar(hints.get("return")) if "return" in hints else False
 
     resolved_name = output_name if output_name else name_parts[-1]
 
     return CurrySpec(
-        func=FuncInfo(name=resolved_name, args=args,
-                      return_annotation_str=ret_str, return_has_typevars=ret_has_tv),
+        func=FuncInfo(
+            name=resolved_name,
+            args=args,
+            return_annotation_str=ret_str,
+            return_typevars=ret_typevars,
+        ),
         preamble=preamble,
         n=n, m=m,
         track_keywords=track_keywords,
@@ -248,22 +259,9 @@ def load_spec(yaml_path: str) -> CurrySpec:
 # Code generation
 # ---------------------------------------------------------------------------
 
-@dataclass
-class _ProtoInfo:
-    """Computed info about a Protocol variant."""
-    class_name: str
-    # Ordered typevar-containing slots (ArgSlot or None=return)
-    tv_slots: list[ArgSlot | None]
-    # Matching type param names (_T0, _T1, ..., _R)
-    type_params: list[str]
-    # All args present (including concrete-typed ones)
-    all_args: list[ArgSlot]
-
-
 def generate(spec: CurrySpec) -> str:
     func = spec.func
     n, m = spec.n, spec.m
-    track_kw_names = set(spec.track_keywords)
     provided_names = spec.provided_names
     fname = spec.output_name or func.name
 
@@ -271,69 +269,21 @@ def generate(spec: CurrySpec) -> str:
     required = func.args[:n]
     opt_pos = func.args[n : n + m]
     rest = func.args[n + m :]
-    tracked = [a for a in rest if a.name in track_kw_names]
-    untracked = [a for a in rest if a.name not in track_kw_names]
-
-    # Map tracked arg name -> its position in the tracked list
-    tracked_name_to_idx = {a.name: i for i, a in enumerate(tracked)}
-    # Map tracked list index -> provided_name
-    # provided_names[i] corresponds to spec.track_keywords[i] which corresponds to tracked[i]
-    # (assuming tracked order matches spec.track_keywords order)
-    # Let's reorder tracked to match spec.track_keywords order
-    tracked_by_name = {a.name: a for a in tracked}
+    tracked_by_name = {a.name: a for a in rest if a.name in set(spec.track_keywords)}
     tracked = [tracked_by_name[name] for name in spec.track_keywords]
-    tracked_name_to_idx = {a.name: i for i, a in enumerate(tracked)}
+    untracked = [a for a in rest if a.name not in set(spec.track_keywords)]
 
     o = len(tracked)
     tk_positions = list(range(o))
+    tracked_ids = {id(a) for a in tracked}
+    untracked_ids = {id(a) for a in untracked}
 
     # ------------------------------------------------------------------
-    # Helpers for Protocol slot computation
+    # Naming
     # ------------------------------------------------------------------
-
-    def _tv_slots(args_present: list[ArgSlot]) -> list[ArgSlot | None]:
-        """Typevar-containing slots: args with typevars + return."""
-        slots: list[ArgSlot | None] = [a for a in args_present if a.has_typevars]
-        if func.return_has_typevars:
-            slots.append(None)
-        return slots
-
-    def _type_params(tv_slots: list[ArgSlot | None]) -> list[str]:
-        params: list[str] = []
-        ti = 0
-        for slot in tv_slots:
-            if slot is None:
-                params.append("_R")
-            else:
-                params.append(f"_T{ti}")
-                ti += 1
-        return params
-
-    def _all_args_for(k: int, S: frozenset[int]) -> list[ArgSlot]:
-        """All args present in a Protocol(k, S) — required + opt_pos + untracked + remaining tracked."""
-        args: list[ArgSlot] = []
-        args.extend(required[n - k:])
-        args.extend(opt_pos)
-        args.extend(untracked)
-        for i, ta in enumerate(tracked):
-            if i not in S:
-                args.extend([ta])
-        return args
-
-    def _proto_info(k: int, S: frozenset[int]) -> _ProtoInfo:
-        all_args = _all_args_for(k, S)
-        tv_slots = _tv_slots(all_args)
-        tp = _type_params(tv_slots)
-        return _ProtoInfo(
-            class_name=_cls_name(S, k),
-            tv_slots=tv_slots,
-            type_params=tp,
-            all_args=all_args,
-        )
 
     def _to_pascal(name: str) -> str:
-        # Handle snake_case and already-PascalCase
-        return "".join(part.capitalize() for part in name.split("_")) if "_" in name else name[0].upper() + name[1:]
+        return "".join(p.capitalize() for p in name.split("_")) if "_" in name else name[0].upper() + name[1:]
 
     fname_pascal = _to_pascal(fname)
 
@@ -343,34 +293,32 @@ def generate(spec: CurrySpec) -> str:
             prefix += "".join(provided_names[i] for i in sorted(S))
         return f"{prefix}Curried{k}"
 
-    def _type_args_from_proto(src: _ProtoInfo, tgt: _ProtoInfo) -> list[str]:
-        """Map src type params to tgt type params by slot identity."""
-        src_map = {_slot_id(s): p for s, p in zip(src.tv_slots, src.type_params)}
-        return [src_map[_slot_id(s)] for s in tgt.tv_slots]
+    # ------------------------------------------------------------------
+    # Protocol type params
+    #
+    # For Protocol(k, S): type params = TypeVars from consumed args,
+    # i.e. required[0..n-k-1] + tracked[i for i in S].
+    # Ordered by first appearance, deduplicated.
+    # ------------------------------------------------------------------
 
-    def _type_args_from_entry(tgt: _ProtoInfo) -> list[str]:
-        """Map original annotation strings to tgt type params."""
+    def _proto_type_params(k: int, S: frozenset[int]) -> list[str]:
+        consumed = list(required[0 : n - k]) + [tracked[i] for i in sorted(S)]
+        seen: set[str] = set()
         result: list[str] = []
-        for slot in tgt.tv_slots:
-            if slot is None:
-                result.append(func.return_annotation_str)
-            else:
-                result.append(slot.annotation_str)
+        for arg in consumed:
+            for tv in arg.typevars:
+                if tv not in seen:
+                    seen.add(tv)
+                    result.append(tv)
         return result
 
-    def _ref_str(cls_name: str, type_args: list[str], quoted: bool) -> str:
-        if type_args:
-            s = f"{cls_name}[{', '.join(type_args)}]"
-        else:
-            s = cls_name
-        return f"'{s}'" if quoted else s
+    # ------------------------------------------------------------------
+    # Rendering helpers
+    # ------------------------------------------------------------------
 
-    # ------------------------------------------------------------------
-    # Forward-reference quoting logic
-    # ------------------------------------------------------------------
-    # Generation order: k=1..n, within each k: largest S first.
-    all_subsets = powerset(tk_positions)
-    all_subsets.sort(key=lambda s: -len(s))
+    def _ref_str(cls_name: str, type_params: list[str], quoted: bool) -> str:
+        s = f"{cls_name}[{', '.join(type_params)}]" if type_params else cls_name
+        return f"'{s}'" if quoted else s
 
     def _needs_quotes(cur_k: int, cur_S: frozenset[int],
                       tgt_k: int, tgt_S: frozenset[int]) -> bool:
@@ -378,87 +326,45 @@ def generate(spec: CurrySpec) -> str:
             return True
         if tgt_k == cur_k:
             if tgt_S == cur_S:
-                return True  # self
+                return True
             if len(tgt_S) < len(cur_S):
-                return True  # defined after us at same level
+                return True
         return False
-
-    # ------------------------------------------------------------------
-    # Build a type-map for an overload inside a Protocol
-    # ------------------------------------------------------------------
-
-    def _proto_type_map(info: _ProtoInfo) -> dict[int, str]:
-        """arg.index -> type string to use inside a Protocol overload."""
-        m: dict[int, str] = {}
-        for slot, tp in zip(info.tv_slots, info.type_params):
-            if slot is not None:
-                m[slot.index] = tp
-        return m
-
-    # ------------------------------------------------------------------
-    # Render a parameter list
-    # ------------------------------------------------------------------
 
     def _render_params(
         positional: list[ArgSlot],
-        kw_provided: list[ArgSlot],   # tracked kwargs being provided
+        kw_provided: list[ArgSlot],
         include_untracked: bool,
-        force_kw_tracked: bool,       # force tracked kwargs to be kw-only (Protocol-returning)
-        type_map: dict[int, str],     # arg.index -> type string (for Protocol context)
-        use_original: bool,           # True for entry-point overloads
+        force_kw_tracked: bool,
     ) -> str:
         parts: list[str] = []
 
-        def _type_for(arg: ArgSlot) -> str:
-            if use_original:
-                return arg.annotation_str
-            return type_map.get(arg.index, arg.annotation_str)
-
-        # --- Positional args ---
         has_pos_only = False
         last_pos_only_idx = -1
         for arg in positional:
             if arg.is_pos_only:
                 has_pos_only = True
                 last_pos_only_idx = len(parts)
-            parts.append(f"{arg.name}: {_type_for(arg)}")
+            parts.append(f"{arg.name}: {arg.annotation_str}")
 
         if has_pos_only:
             parts.insert(last_pos_only_idx + 1, "/")
 
-        # --- Keyword args (tracked provided + untracked) ---
-        kw_args_to_add: list[tuple[ArgSlot, bool]] = []  # (arg, with_default)
-
-        for arg in kw_provided:
-            kw_args_to_add.append((arg, True))
-
+        kw_args: list[ArgSlot] = list(kw_provided)
         if include_untracked:
-            for arg in untracked:
-                kw_args_to_add.append((arg, True))
+            kw_args.extend(untracked)
 
-        if kw_args_to_add:
-            # Determine if we need a * separator
-            # Need * if: any arg is forced keyword-only, or is originally keyword-only,
-            # AND there isn't already a * context from positional args.
-            need_star = False
-            for arg, _ in kw_args_to_add:
-                if force_kw_tracked and arg in tracked:
-                    need_star = True
-                elif arg.is_kw_only:
-                    need_star = True
-                elif arg in untracked:
-                    # Untracked are always keyword-only in curried context
-                    need_star = True
-
+        if kw_args:
+            need_star = any(
+                (force_kw_tracked and id(a) in tracked_ids)
+                or a.is_kw_only
+                or (id(a) in untracked_ids)
+                for a in kw_args
+            )
             if need_star:
                 parts.append("*")
-
-            for arg, with_default in kw_args_to_add:
-                t = _type_for(arg)
-                if with_default:
-                    parts.append(f"{arg.name}: {t} = ...")
-                else:
-                    parts.append(f"{arg.name}: {t}")
+            for arg in kw_args:
+                parts.append(f"{arg.name}: {arg.annotation_str} = ...")
 
         return ", ".join(parts)
 
@@ -469,214 +375,101 @@ def generate(spec: CurrySpec) -> str:
     lines: list[str] = []
     pr = lines.append
 
-    # Preamble
     pr(spec.preamble)
     pr("")
+    pr("from typing import Protocol, overload")
+    pr("")
 
-    # Determine max _T index needed across all Protocols
-    max_t = 0
+    all_subsets = powerset(tk_positions)
+    all_subsets.sort(key=lambda s: -len(s))  # largest subsets first within each level
+
+    # Protocol classes (k=1..n, largest keyword subsets first within each k)
     for k in range(1, n + 1):
         for S_tuple in all_subsets:
             S = frozenset(S_tuple)
-            info = _proto_info(k, S)
-            count = sum(1 for s in info.tv_slots if s is not None)
-            if count > max_t:
-                max_t = count
-    # Also check entry-point
-    entry_info = _proto_info(n, frozenset())
-    entry_count = sum(1 for s in entry_info.tv_slots if s is not None)
-    if entry_count > max_t:
-        max_t = entry_count
-
-    # Emit TypeVar declarations
-    pr("from typing import Protocol, TypeVar, overload")
-    pr("")
-    for i in range(max_t):
-        pr(f"_T{i} = TypeVar('_T{i}', contravariant=True)")
-    if func.return_has_typevars:
-        pr("_R = TypeVar('_R', covariant=True)")
-    pr("")
-
-    # ------------------------------------------------------------------
-    # Protocol classes
-    # ------------------------------------------------------------------
-
-    for k in range(1, n + 1):
-        for S_tuple in all_subsets:
-            S = frozenset(S_tuple)
-            info = _proto_info(k, S)
-            tm = _proto_type_map(info)
-            ret_type_str = "_R" if func.return_has_typevars else func.return_annotation_str
+            type_params = _proto_type_params(k, S)
+            cls = _cls_name(S, k)
 
             remaining_kw_indices = [i for i in tk_positions if i not in S]
             remaining_kw_subsets = powerset(remaining_kw_indices)
-
-            # Class header
-            if info.type_params:
-                pr(f"class {info.class_name}(Protocol[{', '.join(info.type_params)}]):")
-            else:
-                pr(f"class {info.class_name}(Protocol):")
-
             remaining_req = required[n - k:]
+
+            if type_params:
+                pr(f"class {cls}(Protocol[{', '.join(type_params)}]):")
+            else:
+                pr(f"class {cls}(Protocol):")
 
             for p in range(k + m, -1, -1):
                 for T_tuple in remaining_kw_subsets:
                     T = frozenset(T_tuple)
                     ST = S | T
 
-                    # Positional args for this overload
-                    if p <= k:
-                        pos = list(remaining_req[:p])
-                    else:
-                        pos = list(remaining_req) + list(opt_pos[: p - k])
-
+                    pos = list(remaining_req[:p]) if p <= k else list(remaining_req) + list(opt_pos[:p - k])
                     tracked_provided = [tracked[i] for i in sorted(T)]
 
                     if p >= k:
-                        # All required met -> R
-                        params = _render_params(
-                            pos, tracked_provided,
-                            include_untracked=True,
-                            force_kw_tracked=False,
-                            type_map=tm,
-                            use_original=False,
-                        )
+                        # All required satisfied → return type
+                        params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
                         pr("    @overload")
-                        if params:
-                            pr(f"    def __call__(self, {params}) -> {ret_type_str}: ...")
-                        else:
-                            pr(f"    def __call__(self) -> {ret_type_str}: ...")
+                        pr(f"    def __call__(self{',' if params else ''} {params}) -> {func.return_annotation_str}: ..." if params else f"    def __call__(self) -> {func.return_annotation_str}: ...")
 
                     elif p > 0:
-                        # Partial -> Curried(k-p) with subset ST
+                        # Partial application → lower Protocol
                         tgt_k = k - p
-                        tgt_info = _proto_info(tgt_k, ST)
-                        quoted = _needs_quotes(k, S, tgt_k, ST)
-                        targs = _type_args_from_proto(info, tgt_info)
-                        ref = _ref_str(tgt_info.class_name, targs, quoted)
-
-                        params = _render_params(
-                            pos, tracked_provided,
-                            include_untracked=True,
-                            force_kw_tracked=True,
-                            type_map=tm,
-                            use_original=False,
-                        )
+                        tgt_tp = _proto_type_params(tgt_k, ST)
+                        ref = _ref_str(_cls_name(ST, tgt_k), tgt_tp, _needs_quotes(k, S, tgt_k, ST))
+                        params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=True)
                         pr("    @overload")
                         pr(f"    def __call__(self, {params}) -> {ref}: ...")
 
                     else:
                         # p == 0
                         if not T:
-                            # Self-reference (untracked kwargs subsume the empty case)
-                            ref = _ref_str(info.class_name, info.type_params, True)
-                            params = _render_params(
-                                [], [],
-                                include_untracked=True,
-                                force_kw_tracked=True,
-                                type_map=tm,
-                                use_original=False,
-                            )
+                            # Self-reference (untracked kwargs subsume the plain empty case)
+                            ref = _ref_str(cls, type_params, True)
+                            params = _render_params([], [], include_untracked=True, force_kw_tracked=True)
                             pr("    @overload")
-                            if params:
-                                pr(f"    def __call__(self, {params}) -> {ref}: ...")
-                            else:
-                                pr(f"    def __call__(self) -> {ref}: ...")
+                            pr(f"    def __call__(self, {params}) -> {ref}: ..." if params else f"    def __call__(self) -> {ref}: ...")
                         else:
-                            tgt_info = _proto_info(k, ST)
-                            quoted = _needs_quotes(k, S, k, ST)
-                            targs = _type_args_from_proto(info, tgt_info)
-                            ref = _ref_str(tgt_info.class_name, targs, quoted)
-
-                            params = _render_params(
-                                [], tracked_provided,
-                                include_untracked=False,
-                                force_kw_tracked=True,
-                                type_map=tm,
-                                use_original=False,
-                            )
+                            # Only tracked kwargs provided → same currying level, larger subset
+                            tgt_tp = _proto_type_params(k, ST)
+                            ref = _ref_str(_cls_name(ST, k), tgt_tp, _needs_quotes(k, S, k, ST))
+                            params = _render_params([], tracked_provided, include_untracked=False, force_kw_tracked=True)
                             pr("    @overload")
                             pr(f"    def __call__(self, {params}) -> {ref}: ...")
 
             pr("")
 
-    # ------------------------------------------------------------------
     # Entry-point overloads
-    # ------------------------------------------------------------------
-
-    remaining_kw_subsets = powerset(tk_positions)
-
     for p in range(n + m, -1, -1):
-        for T_tuple in remaining_kw_subsets:
+        for T_tuple in powerset(tk_positions):
             T = frozenset(T_tuple)
 
-            if p <= n:
-                pos = list(required[:p])
-            else:
-                pos = list(required) + list(opt_pos[: p - n])
-
+            pos = list(required[:p]) if p <= n else list(required) + list(opt_pos[:p - n])
             tracked_provided = [tracked[i] for i in sorted(T)]
 
             if p >= n:
-                # All required met -> R
-                params = _render_params(
-                    pos, tracked_provided,
-                    include_untracked=True,
-                    force_kw_tracked=False,
-                    type_map={},  # not used when use_original=True
-                    use_original=True,
-                )
+                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False)
                 pr("@overload")
-                if params:
-                    pr(f"def {fname}({params}) -> {func.return_annotation_str}: ...")
-                else:
-                    pr(f"def {fname}() -> {func.return_annotation_str}: ...")
+                pr(f"def {fname}({params}) -> {func.return_annotation_str}: ..." if params else f"def {fname}() -> {func.return_annotation_str}: ...")
 
             elif p > 0:
                 tgt_k = n - p
-                tgt_info = _proto_info(tgt_k, T)
-                targs = _type_args_from_entry(tgt_info)
-                ref = _ref_str(tgt_info.class_name, targs, False)
-
-                params = _render_params(
-                    pos, tracked_provided,
-                    include_untracked=True,
-                    force_kw_tracked=True,
-                    type_map={},
-                    use_original=True,
-                )
+                tgt_tp = _proto_type_params(tgt_k, T)
+                ref = _ref_str(_cls_name(T, tgt_k), tgt_tp, False)
+                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=True)
                 pr("@overload")
                 pr(f"def {fname}({params}) -> {ref}: ...")
 
             else:
+                tgt_tp = _proto_type_params(n, T)
+                ref = _ref_str(_cls_name(T, n), tgt_tp, False)
                 if not T:
-                    tgt_info = _proto_info(n, frozenset())
-                    targs = _type_args_from_entry(tgt_info)
-                    ref = _ref_str(tgt_info.class_name, targs, False)
-                    params = _render_params(
-                        [], [],
-                        include_untracked=True,
-                        force_kw_tracked=True,
-                        type_map={},
-                        use_original=True,
-                    )
+                    params = _render_params([], [], include_untracked=True, force_kw_tracked=True)
                     pr("@overload")
-                    if params:
-                        pr(f"def {fname}({params}) -> {ref}: ...")
-                    else:
-                        pr(f"def {fname}() -> {ref}: ...")
+                    pr(f"def {fname}({params}) -> {ref}: ..." if params else f"def {fname}() -> {ref}: ...")
                 else:
-                    tgt_info = _proto_info(n, T)
-                    targs = _type_args_from_entry(tgt_info)
-                    ref = _ref_str(tgt_info.class_name, targs, False)
-
-                    params = _render_params(
-                        [], tracked_provided,
-                        include_untracked=False,
-                        force_kw_tracked=True,
-                        type_map={},
-                        use_original=True,
-                    )
+                    params = _render_params([], tracked_provided, include_untracked=False, force_kw_tracked=True)
                     pr("@overload")
                     pr(f"def {fname}({params}) -> {ref}: ...")
 
@@ -737,6 +530,7 @@ def main() -> None:
         print("Usage: python gen_custom_curried_stubs.py <spec.yaml>", file=sys.stderr)
         print("       python gen_custom_curried_stubs.py --create-template <dir>", file=sys.stderr)
         sys.exit(1)
+
     spec = load_spec(sys.argv[1])
     print(generate(spec))
 
