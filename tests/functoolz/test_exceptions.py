@@ -17,33 +17,33 @@ def bad_type(x):
 # ── excepts ───────────────────────────────────────────────────────────────────
 
 def test_excepts_success_returns_normally():
-    fn = excepts(lambda e: -1, ValueError, good)
+    fn = excepts(ValueError, good, lambda e: -1)
     assert fn(5) == 10
 
 def test_excepts_caught_calls_handler():
-    fn = excepts(lambda e: -1, ValueError, bad_value)
+    fn = excepts(ValueError, bad_value, lambda e: -1)
     assert fn(0) == -1
 
 def test_excepts_handler_receives_exception():
     received = []
-    fn = excepts(lambda e: received.append(e), ValueError, bad_value)
+    fn = excepts(ValueError, bad_value, lambda e: received.append(e))
     fn(0)
     assert len(received) == 1
     assert isinstance(received[0], ValueError)
 
 def test_excepts_uncaught_propagates():
-    fn = excepts(lambda e: -1, TypeError, bad_value)
+    fn = excepts(TypeError, bad_value, lambda e: -1)
     with pytest.raises(ValueError):
         fn(0)
 
 def test_excepts_tuple_of_exceptions():
-    fn = excepts(lambda e: "caught", (ValueError, TypeError), bad_value)
+    fn = excepts((ValueError, TypeError), bad_value, lambda e: "caught")
     assert fn(0) == "caught"
-    fn2 = excepts(lambda e: "caught", (ValueError, TypeError), bad_type)
+    fn2 = excepts((ValueError, TypeError), bad_type, lambda e: "caught")
     assert fn2(0) == "caught"
 
 def test_excepts_passes_args_through():
-    fn = excepts(lambda e: None, ValueError, lambda x, y: x + y)
+    fn = excepts(ValueError, lambda x, y: x + y, lambda e: None)
     assert fn(3, 4) == 7
 
 
