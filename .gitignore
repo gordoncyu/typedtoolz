@@ -209,3 +209,5 @@ __marimo__/
 # vim
 /Session.vim
 /.*.py
+
+/.toolz_tests
