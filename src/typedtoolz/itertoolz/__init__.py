@@ -12,6 +12,7 @@ from ._set_ops import unique, diff, join
 from ._building import remove, accumulate, cons, interpose, interleave, iterate, concat, concatv, mapcat
 from ._sorting import merge_sorted, topk
 from ._statistics import random_sample
+from toolz.itertoolz import getter
 
 __all__ = [
         "no_default",

@@ -1,22 +1,31 @@
-from collections.abc import Callable, Iterable, Mapping, Sequence
-from typing import Any, TypeVar
+from collections.abc import Callable, Iterable, Mapping, MutableMapping, Sequence
+from typing import Any, TypeVar, cast, overload
 from typing_extensions import override
 from cytoolz.dicttoolz import assoc as cyassoc, dissoc as cydissoc, assoc_in as cyassoc_in, update_in as cyupdate_in, get_in as cyget_in  # pyright: ignore[reportUnknownVariableType]
 from typedtoolz.functoolz._curry import curry
 from typedtoolz.functoolz._curryv import curryv
 
+
 K = TypeVar('K')
 V = TypeVar('V')
 D = TypeVar('D')
+F = TypeVar('F', bound=MutableMapping[object, Any])  # pyright: ignore[reportExplicitAny]
 
 _missing = object()
 
-
 class _assoc_meta(type):
     @staticmethod
+    @overload
+    def __call__(d: Mapping[K, V], key: K, value: V) -> dict[K, V]: ...
+    @staticmethod
+    @overload
+    def __call__(d: Mapping[K, V], key: K, value: V, factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(d: Mapping[K, V], key: K, value: V) -> dict[K, V]:
-        return cyassoc(d, key, value)  # pyright: ignore[reportUnknownVariableType]
+    def __call__(d: Mapping[K, V], key: K, value: V, factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
+        if factory is _missing:
+            return cyassoc(d, key, value)  # pyright: ignore[reportUnknownVariableType]
+        return cyassoc(d, key, value, factory=factory)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _assoc(metaclass=_assoc_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -35,9 +44,17 @@ assoc = _assoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/do
 
 class _dissoc_meta(type):
     @staticmethod
+    @overload
+    def __call__(d: Mapping[K, V], *keys: K) -> dict[K, V]: ...
+    @staticmethod
+    @overload
+    def __call__(d: Mapping[K, V], *keys: K, factory: Callable[[], F]) -> F: ...
+    @staticmethod
     @override
-    def __call__(d: Mapping[K, V], *keys: K) -> dict[K, V]:
-        return cydissoc(d, *keys)  # pyright: ignore[reportUnknownVariableType]
+    def __call__(d: Mapping[K, V], *keys: K, factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[K, V] | F:  # pyright: ignore[reportCallInDefaultInitializer]
+        if factory is _missing:
+            return cydissoc(d, *keys)  # pyright: ignore[reportUnknownVariableType]
+        return cydissoc(d, *keys, factory=factory)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _dissoc(metaclass=_dissoc_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -56,9 +73,17 @@ dissoc = _dissoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/
 
 class _assoc_in_meta(type):
     @staticmethod
+    @overload
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object) -> dict[object, Any]: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
+    @overload
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object, factory: Callable[[], F]) -> F: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
     @override
-    def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
-        return cyassoc_in(d, keys, value)  # pyright: ignore[reportUnknownVariableType]
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], value: object, factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[object, Any] | F:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
+        if factory is _missing:
+            return cyassoc_in(d, keys, value)  # pyright: ignore[reportUnknownVariableType]
+        return cyassoc_in(d, keys, value, factory=factory)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _assoc_in(metaclass=_assoc_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
@@ -77,11 +102,17 @@ assoc_in = _assoc_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/m
 
 class _update_in_meta(type):
     @staticmethod
+    @overload
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = None) -> dict[object, Any]: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
+    @overload
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = None, factory: Callable[[], F] = ...) -> dict[object, Any]: ...  # pyright: ignore[reportExplicitAny]
+    @staticmethod
     @override
-    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = _missing) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny]
-        if default is _missing:
-            return cyupdate_in(d, keys, func)  # pyright: ignore[reportUnknownVariableType]
-        return cyupdate_in(d, keys, func, default)  # pyright: ignore[reportUnknownVariableType]
+    def __call__(d: Mapping[object, Any], keys: Iterable[object], func: Callable[..., object], default: object = None, factory: Callable[[], F] = cast(Callable[[], F], _missing)) -> dict[object, Any]:  # pyright: ignore[reportExplicitAny, reportCallInDefaultInitializer]
+        if factory is _missing:
+            return cyupdate_in(d, keys, func, default)  # pyright: ignore[reportUnknownVariableType]
+        return cyupdate_in(d, keys, func, default, factory=factory)  # pyright: ignore[reportUnknownVariableType]
 
 
 class _update_in(metaclass=_update_in_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md

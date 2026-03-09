@@ -152,7 +152,10 @@ def patch_imports(cache_dir: Path) -> None:
                         return m.group(0)
                     return "typedtoolz" + cast(str, postfix)
                 line = TOOLZ_RE.sub(replace_maybe, line)
-            if line.strip() == "assert excepting.__doc__ == excepts.__doc__":
+            if line.strip() in (
+                    "assert excepting.__doc__ == excepts.__doc__",
+                    "assert excepts.__name__ == 'excepts'",
+                    ):
                 line = "\n"
             lines.append(line)
         patched = "".join(lines)

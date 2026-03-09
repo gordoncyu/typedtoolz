@@ -1,5 +1,5 @@
 from cytoolz import excepts as cyexcepts
-from typing import Any, Callable, Literal, ParamSpec, TypeVar
+from typing import Any, Callable, Literal, ParamSpec, TypeVar, cast, overload
 from typing_extensions import override
 from typedtoolz._top_level import identity, return_none
 from typedtoolz.functoolz._curry import curry
@@ -16,14 +16,26 @@ E = TypeVar('E')
 
 Ps = ParamSpec("Ps")
 
+_missing = object()
+
 class _excepts_meta(type):
+    @staticmethod
+    @overload
+    def __call__(  # pyright: ignore[reportInconsistentOverload]
+        exc: type[E] | tuple[type[E]],
+        func: Callable[Ps, B],
+        handler: Callable[[E], D] = return_none,
+    ) -> Callable[Ps, B | D]: ...
+
     @staticmethod
     @override
     def __call__(
         exc: type[E] | tuple[type[E]],
         func: Callable[Ps, B],
-        handler: Callable[[E], D] = return_none,
+        handler: Callable[[E], D] = cast(Callable[[E], D], _missing),  # pyright: ignore[reportCallInDefaultInitializer]
     ) -> Callable[Ps, B | D]:
+        if handler is _missing:
+            return cyexcepts(exc, func)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
         return cyexcepts(exc, func, handler)  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
 
     @staticmethod
@@ -36,14 +48,34 @@ class _excepts_meta(type):
 
 
 class _excepts(metaclass=_excepts_meta):  # See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md
-    """Wrap func to catch exc and pass the exception to handler.
+    """
+    A wrapper around a function to catch exceptions and
+    dispatch to a handler.
 
-    excepts(handler, exc, func) -> Callable[Ps, B | D]
+    This is like a functional try/except block, in the same way that
+    ifexprs are functional if/else blocks.
 
-    When func raises an exception matching exc, handler is called with the
-    exception and its return value is substituted for the normal return.
+    Examples
+    --------
+    >>> excepting = excepts(
+    ...     ValueError,
+    ...     lambda a: [1, 2].index(a),
+    ...     lambda _: -1,
+    ... )
+    >>> excepting(1)
+    0
+    >>> excepting(3)
+    -1
 
-    Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
+    Multiple exceptions and default except clause.
+
+    >>> excepting = excepts((IndexError, KeyError), lambda a: a[0])
+    >>> excepting([])
+    >>> excepting([1])
+    1
+    >>> excepting({})
+    >>> excepting({0: 1})
+    1
     """
     c = curry(_excepts_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
     cn = c(return_none)  # pyright: ignore[reportUnannotatedClassAttribute]
