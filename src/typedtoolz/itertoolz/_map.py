@@ -139,7 +139,7 @@ class _map(metaclass=_map_meta):  # See: https://github.com/gordoncyu/typedtoolz
 
     Has a curried version as the property c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _map_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2)(_map_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 map = _map  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 

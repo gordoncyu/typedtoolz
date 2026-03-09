@@ -27,7 +27,7 @@ class _assoc(metaclass=_assoc_meta):  # See: https://github.com/gordoncyu/typedt
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(3, _assoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_assoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 assoc = _assoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -48,7 +48,7 @@ class _dissoc(metaclass=_dissoc_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _dissoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curryv(2)(_dissoc_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 dissoc = _dissoc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -69,7 +69,7 @@ class _assoc_in(metaclass=_assoc_in_meta):  # See: https://github.com/gordoncyu/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(3, _assoc_in_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_assoc_in_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 assoc_in = _assoc_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -92,7 +92,7 @@ class _update_in(metaclass=_update_in_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(3, _update_in_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_update_in_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 update_in = _update_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -122,8 +122,8 @@ class _get_in(metaclass=_get_in_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _get_in_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage] # TODO: maybe make default c one not a foot gun (no default)
-    cd = curry(3, _get_in_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_get_in_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage] # TODO: maybe make default c one not a foot gun (no default)
+    cd = curry(3)(_get_in_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 get_in = _get_in  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

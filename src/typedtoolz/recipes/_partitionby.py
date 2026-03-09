@@ -23,7 +23,7 @@ class _partitionby(metaclass=_partitionby_meta):  # See: https://github.com/gord
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _partitionby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_partitionby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 partitionby = _partitionby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

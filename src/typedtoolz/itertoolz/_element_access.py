@@ -70,7 +70,7 @@ class _nth(metaclass=_nth_meta):  # See: https://github.com/gordoncyu/typedtoolz
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _nth_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_nth_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 nth = _nth  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -199,7 +199,7 @@ class _peekn(metaclass=_peekn_meta):  # See: https://github.com/gordoncyu/typedt
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _peekn_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_peekn_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 peekn = _peekn  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

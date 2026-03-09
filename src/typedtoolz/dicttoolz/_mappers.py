@@ -39,8 +39,8 @@ class _valmap(metaclass=_valmap_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _valmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cf = curry(3, _valmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_valmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3)(_valmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 valmap = _valmap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -72,8 +72,8 @@ class _keymap(metaclass=_keymap_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _keymap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cf = curry(3, _keymap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_keymap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3)(_keymap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 keymap = _keymap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -106,8 +106,8 @@ class _itemmap(metaclass=_itemmap_meta):  # See: https://github.com/gordoncyu/ty
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _itemmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cf = curry(3, _itemmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_itemmap_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cf = curry(3)(_itemmap_meta._call_factory)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 itemmap = _itemmap  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

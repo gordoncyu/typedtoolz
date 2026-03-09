@@ -26,7 +26,7 @@ class _groupby(metaclass=_groupby_meta):  # See: https://github.com/gordoncyu/ty
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _groupby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_groupby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 groupby = _groupby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -59,8 +59,8 @@ class _reduceby(metaclass=_reduceby_meta):  # See: https://github.com/gordoncyu/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(3, _reduceby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    ci = curry(4, _reduceby_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(3)(_reduceby_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    ci = curry(4)(_reduceby_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 reduceby = _reduceby  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

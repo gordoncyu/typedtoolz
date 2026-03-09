@@ -37,8 +37,8 @@ class _valfilter(metaclass=_valfilter_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _valfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cd = curry(3, _valfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage, reportUnannotatedClassAttribute]
+    c = curry(2)(_valfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(3)(_valfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage, reportUnannotatedClassAttribute]
 
 
 valfilter = _valfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -71,8 +71,8 @@ class _keyfilter(metaclass=_keyfilter_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _keyfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    c = curry(3, _keyfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
+    c = curry(2)(_keyfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_keyfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
 
 
 keyfilter = _keyfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -105,8 +105,8 @@ class _itemfilter(metaclass=_itemfilter_meta):  # See: https://github.com/gordon
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _itemfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    c = curry(3, _itemfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
+    c = curry(2)(_itemfilter_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_itemfilter_meta._call_factory)  # pyright: ignore[reportPrivateUsage]
 
 
 itemfilter = _itemfilter  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

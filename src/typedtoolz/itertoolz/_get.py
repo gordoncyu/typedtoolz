@@ -65,14 +65,14 @@ class _get(metaclass=_get_meta):  # See: https://github.com/gordoncyu/typedtoolz
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _get_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cd = curry(3, _get_meta._call_ind_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_get_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(3)(_get_meta._call_ind_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
-    cs = curry(2, _get_meta._call_inds)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    csd = curry(3, _get_meta._call_inds_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cs = curry(2)(_get_meta._call_inds)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    csd = curry(3)(_get_meta._call_inds_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
-    cm = curry(2, _get_meta._call_mapping)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cmd = curry(3, _get_meta._call_mapping_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cm = curry(2)(_get_meta._call_mapping)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cmd = curry(3)(_get_meta._call_mapping_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 get = _get  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

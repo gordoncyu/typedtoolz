@@ -25,7 +25,7 @@ class _sliding_window(metaclass=_sliding_window_meta):  # See: https://github.co
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _sliding_window_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_sliding_window_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 sliding_window = _sliding_window  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -57,8 +57,8 @@ class _partition(metaclass=_partition_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _partition_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cp = curry(3, _partition_meta._call_pad)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(2)(_partition_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cp = curry(3)(_partition_meta._call_pad)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 partition = _partition  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -79,7 +79,7 @@ class _partition_all(metaclass=_partition_all_meta):  # See: https://github.com/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _partition_all_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_partition_all_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 partition_all = _partition_all  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

@@ -94,7 +94,7 @@ class _takewhile_acc(metaclass=_takewhile_acc_meta):  # See: https://github.com/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curryv(2)(_takewhile_acc_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 takewhile_acc = _takewhile_acc  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 

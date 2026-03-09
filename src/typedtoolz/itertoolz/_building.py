@@ -29,7 +29,7 @@ class _remove(metaclass=_remove_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _remove_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_remove_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 remove = _remove  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -62,8 +62,8 @@ class _accumulate(metaclass=_accumulate_meta):  # See: https://github.com/gordon
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _accumulate_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    c = curry(3, _accumulate_meta._call_default)  # pyright: ignore[reportPrivateUsage]
+    c = curry(2)(_accumulate_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(3)(_accumulate_meta._call_default)  # pyright: ignore[reportPrivateUsage]
 
 
 accumulate = _accumulate  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -84,7 +84,7 @@ class _cons(metaclass=_cons_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _cons_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_cons_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 cons = _cons  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -105,7 +105,7 @@ class _interpose(metaclass=_interpose_meta):  # See: https://github.com/gordoncy
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _interpose_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_interpose_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 interpose = _interpose  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -144,7 +144,7 @@ class _iterate(metaclass=_iterate_meta):  # See: https://github.com/gordoncyu/ty
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _iterate_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_iterate_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 iterate = _iterate  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -202,7 +202,7 @@ class _mapcat(metaclass=_mapcat_meta):  # See: https://github.com/gordoncyu/type
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _mapcat_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_mapcat_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 mapcat = _mapcat  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

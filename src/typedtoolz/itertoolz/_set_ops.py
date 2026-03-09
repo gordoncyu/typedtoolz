@@ -33,8 +33,8 @@ class _unique(metaclass=_unique_meta):  # See: https://github.com/gordoncyu/type
 
     Return only unique elements of a sequence.
     """
-    c = curry(1, _unique_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    ck = curry(2, _unique_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(1)(_unique_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    ck = curry(2)(_unique_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 unique = _unique  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
@@ -85,10 +85,10 @@ class _diff(metaclass=_diff_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Return those items that differ between sequences.
     """
-    c = curryv(1, _diff_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cd = curryv(2, _diff_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    ck = curryv(2, _diff_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cdk = curryv(3, _diff_meta._call_default_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curryv(1)(_diff_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cd = curryv(2)(_diff_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    ck = curryv(2)(_diff_meta._call_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cdk = curryv(3)(_diff_meta._call_default_key)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 diff = _diff  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
 
@@ -148,10 +148,10 @@ class _join(metaclass=_join_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(4, _join_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
-    cd = curry(6, _join_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cld = curry(5, _join_meta._call_left_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    crd = curry(5, _join_meta._call_right_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curry(4)(_join_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    cd = curry(6)(_join_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cld = curry(5)(_join_meta._call_left_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    crd = curry(5)(_join_meta._call_right_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 join = _join  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

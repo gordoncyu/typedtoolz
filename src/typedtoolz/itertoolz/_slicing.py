@@ -22,7 +22,7 @@ class _take(metaclass=_take_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _take_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_take_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 take = _take  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -43,7 +43,7 @@ class _tail(metaclass=_tail_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _tail_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_tail_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 tail = _tail  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -64,7 +64,7 @@ class _drop(metaclass=_drop_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _drop_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_drop_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 drop = _drop  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
@@ -85,7 +85,7 @@ class _take_nth(metaclass=_take_nth_meta):  # See: https://github.com/gordoncyu/
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curry(2, _take_nth_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
+    c = curry(2)(_take_nth_meta.__call__)  # pyright: ignore[reportUnannotatedClassAttribute]
 
 
 take_nth = _take_nth  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs

@@ -85,10 +85,10 @@ class _fold(metaclass=_fold_meta):  # See: https://github.com/gordoncyu/typedtoo
 
     Has curried versions as properties prefixed with c (see :func:`typedtoolz.functoolz.curry`).
     """
-    c = curryv(2, _fold_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cd = curryv(3, _fold_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    cc = curryv(3, _fold_meta._call_combine)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
-    ccd = curryv(4, _fold_meta._call_combine_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    c = curryv(2)(_fold_meta._call)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cd = curryv(3)(_fold_meta._call_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    cc = curryv(3)(_fold_meta._call_combine)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
+    ccd = curryv(4)(_fold_meta._call_combine_default)  # pyright: ignore[reportUnannotatedClassAttribute, reportPrivateUsage]
 
 
 fold = _fold  # why? See: https://github.com/gordoncyu/typedtoolz/blob/main/docs/typing_bs/metaclass_static_callables.md#msc_hover_bs
