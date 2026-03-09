@@ -1,10 +1,12 @@
 from cytoolz.functoolz import curry as _toolz_curry  # pyright: ignore[reportUnknownVariableType]
 from typing import Any
 
-def curryv(_, f: Any = None): # pyright: ignore[reportAny, reportExplicitAny, reportUnknownParameterType] # purely for pyright, further defined in stub files
+def curryv(n: Any, /):  # pyright: ignore[reportAny, reportExplicitAny]
     """Curry a callable function, with n specifying the arity (required positional arguments).
 
-    curryv(n, fn) -> curried fn
+    curryv(n) -> maker: callable that accepts fn (and optional pre-applied args)
+    curryv(n)(fn) -> curried fn
+    curryv(n)(fn, a1, a2, **kw) -> curried fn with a1, a2, kw pre-applied
 
     Enables partial application of arguments: call the function with an
     incomplete set of arguments and receive a new callable that accepts the
@@ -12,8 +14,7 @@ def curryv(_, f: Any = None): # pyright: ignore[reportAny, reportExplicitAny, re
 
     >>> def mul(x, y):
     ...     return x * y
-    >>> mul = curryv(2, mul)
-    >>> double = mul(2)
+    >>> double = curryv(2)(mul, 2)
     >>> double(10)
     20
 
@@ -33,9 +34,12 @@ def curryv(_, f: Any = None): # pyright: ignore[reportAny, reportExplicitAny, re
 
     See also: :func:`typedtoolz.functoolz.curry`.
     """
-    if f is None:
-        return lambda fn: _toolz_curry(fn)  # pyright: ignore[reportUnknownVariableType, reportUnknownLambdaType]
-    return _toolz_curry(f)  # pyright: ignore[reportUnknownVariableType]
+    if not isinstance(n, int):
+        raise TypeError(f"curryv() first argument must be int, got {type(n).__name__!r}")
+
+    def maker(fn: Any, /, *pre_args: Any, **pre_kwargs: Any) -> Any:  # pyright: ignore[reportAny, reportExplicitAny]
+        return _toolz_curry(fn, *pre_args, **pre_kwargs)  # pyright: ignore[reportUnknownVariableType]
+    return maker
 
 __all__ = [
         "curryv",
