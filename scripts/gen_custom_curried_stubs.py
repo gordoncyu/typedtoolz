@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 """
 gen_custom_curried_stubs.py
----------------------------
+----------------------------------
 Generate custom curried type stubs from a YAML specification.
+Blocks are generated top-down (entry → k=n → … → k=1), then emitted in
+Kahn's topological order so every definition precedes its uses, eliminating
+forward-reference quotes except for unavoidable self-references.
 
 Usage:
     python scripts/gen_custom_curried_stubs.py spec.yaml > output.pyi
@@ -15,6 +18,7 @@ import importlib.util
 import inspect
 import sys
 import typing
+from collections import deque
 from dataclasses import dataclass
 from itertools import combinations
 from pathlib import Path
@@ -376,6 +380,18 @@ def load_spec(yaml_path: str) -> CurrySpec:
 # Code generation
 # ---------------------------------------------------------------------------
 
+# Block identifiers
+# Protocol block: ('proto', k: int, S: frozenset[int])
+# Entry block:    ('entry',)
+BlockId = tuple
+
+ENTRY_ID: BlockId = ('entry',)
+
+
+def proto_id(k: int, S: frozenset[int]) -> BlockId:
+    return ('proto', k, S)
+
+
 def generate(spec: CurrySpec) -> str:
     func = spec.func
     n, m = spec.n, spec.m
@@ -412,10 +428,6 @@ def generate(spec: CurrySpec) -> str:
 
     # ------------------------------------------------------------------
     # Protocol type params
-    #
-    # For Protocol(k, S): type params = TypeVars from consumed args,
-    # i.e. required[0..n-k-1] + tracked[i for i in S].
-    # Ordered by first appearance, deduplicated.
     # ------------------------------------------------------------------
 
     def _proto_type_params(k: int, S: frozenset[int]) -> list[str]:
@@ -436,17 +448,6 @@ def generate(spec: CurrySpec) -> str:
     def _ref_str(cls_name: str, type_params: list[str], quoted: bool) -> str:
         s = f"{cls_name}[{', '.join(type_params)}]" if type_params else cls_name
         return f"'{s}'" if quoted else s
-
-    def _needs_quotes(cur_k: int, cur_S: frozenset[int],
-                      tgt_k: int, tgt_S: frozenset[int]) -> bool:
-        if tgt_k > cur_k:
-            return True
-        if tgt_k == cur_k:
-            if tgt_S == cur_S:
-                return True
-            if len(tgt_S) < len(cur_S):
-                return True
-        return False
 
     def _render_params(
         positional: list[ArgSlot],
@@ -491,10 +492,6 @@ def generate(spec: CurrySpec) -> str:
 
     # ------------------------------------------------------------------
     # Return type resolution with implication precedence
-    #
-    # Precedence: if rule B's `when` is a proper superset of rule A's `when`,
-    # B takes precedence (more specific wins). Among incomparable maximal rules,
-    # the last in list order wins.
     # ------------------------------------------------------------------
 
     def _rule_dominated(impl: TypeImplication, others: list[TypeImplication]) -> bool:
@@ -511,7 +508,6 @@ def generate(spec: CurrySpec) -> str:
         lc_opt_pos: frozenset[int],
         lc_kw: frozenset[int],
     ) -> tuple[str, dict[str, str]]:
-        """Returns (return_type, arg_overrides) for the winning implication."""
         matching = [
             (i, impl) for i, impl in enumerate(spec.implications)
             if not (impl.not_keywords & S) and not (impl.not_positionals & provided_pos)
@@ -523,35 +519,84 @@ def generate(spec: CurrySpec) -> str:
         if not matching:
             return func.return_annotation_str, {}
         matching_impls = [impl for _, impl in matching]
-        # Discard rules dominated by any other matching rule
         maximal = [
             (i, impl) for i, impl in matching
             if not _rule_dominated(impl, [other for other in matching_impls if other is not impl])
         ]
-        # Among maximal (incomparable) rules, take the last by original list index
         _, winner = max(maximal, key=lambda x: x[0])
         ret = winner.return_type or func.return_annotation_str
         return ret, winner.args
 
     # ------------------------------------------------------------------
-    # Emit
+    # Block collection
+    #
+    # We iterate top-down (entry first, then k=n..1) to reflect logical
+    # dependency direction, but collect into named blocks so we can emit
+    # them in topological order afterwards.
     # ------------------------------------------------------------------
-
-    lines: list[str] = []
-    pr = lines.append
-
-    pr(spec.preamble)
-    pr("")
-    pr("from typing import Protocol, overload")
-    pr("")
 
     all_subsets = powerset(tk_positions)
     all_subsets.sort(key=lambda s: -len(s))  # largest subsets first within each level
 
-    # Protocol classes (k=1..n, largest keyword subsets first within each k)
-    for k in range(1, n + 1):
+    # block_id → (lines, deps)
+    blocks: dict[BlockId, tuple[list[str], set[BlockId]]] = {}
+
+    # ── Entry block (top of the conceptual hierarchy) ──────────────────
+
+    elines: list[str] = []
+    edeps: set[BlockId] = set()
+
+    for p in range(n + m, -1, -1):
+        for T_tuple in powerset(tk_positions):
+            T = frozenset(T_tuple)
+
+            pos = list(required[:p]) if p <= n else list(required) + list(opt_pos[:p - n])
+            tracked_provided = [tracked[i] for i in sorted(T)]
+
+            if p >= n:
+                lc_req = frozenset(range(n))
+                lc_opt = frozenset(range(p - n))
+                ret, arg_ovr = _resolve_implications(frozenset(range(n)), T, lc_req, lc_opt, T)
+                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False, arg_overrides=arg_ovr)
+                elines.append("@overload")
+                elines.append(f"def {fname}({params}) -> {ret}: ..." if params else f"def {fname}() -> {ret}: ...")
+
+            elif p > 0:
+                tgt_k = n - p
+                tgt_tp = _proto_type_params(tgt_k, T)
+                tgt = proto_id(tgt_k, T)
+                edeps.add(tgt)
+                ref = _ref_str(_cls_name(T, tgt_k), tgt_tp, False)
+                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=True)
+                elines.append("@overload")
+                elines.append(f"def {fname}({params}) -> {ref}: ...")
+
+            else:
+                tgt_k = n
+                tgt_tp = _proto_type_params(tgt_k, T)
+                tgt = proto_id(tgt_k, T)
+                edeps.add(tgt)
+                ref = _ref_str(_cls_name(T, tgt_k), tgt_tp, False)
+                if not T:
+                    params = _render_params([], [], include_untracked=True, force_kw_tracked=True)
+                    elines.append("@overload")
+                    elines.append(f"def {fname}({params}) -> {ref}: ..." if params else f"def {fname}() -> {ref}: ...")
+                else:
+                    params = _render_params([], tracked_provided, include_untracked=False, force_kw_tracked=True)
+                    elines.append("@overload")
+                    elines.append(f"def {fname}({params}) -> {ref}: ...")
+
+    blocks[ENTRY_ID] = (elines, edeps)
+
+    # ── Protocol blocks (top-down: k=n down to k=1) ────────────────────
+
+    for k in range(n, 0, -1):
         for S_tuple in all_subsets:
             S = frozenset(S_tuple)
+            bid = proto_id(k, S)
+            blines: list[str] = []
+            bdeps: set[BlockId] = set()
+
             type_params = _proto_type_params(k, S)
             cls = _cls_name(S, k)
 
@@ -560,9 +605,9 @@ def generate(spec: CurrySpec) -> str:
             remaining_req = required[n - k:]
 
             if type_params:
-                pr(f"class {cls}(Protocol[{', '.join(type_params)}]):")
+                blines.append(f"class {cls}(Protocol[{', '.join(type_params)}]):")
             else:
-                pr(f"class {cls}(Protocol):")
+                blines.append(f"class {cls}(Protocol):")
 
             for p in range(k + m, -1, -1):
                 for T_tuple in remaining_kw_subsets:
@@ -578,73 +623,86 @@ def generate(spec: CurrySpec) -> str:
                         lc_opt = frozenset(range(p - k))
                         ret, arg_ovr = _resolve_implications(frozenset(range(n)), ST, lc_req, lc_opt, T)
                         params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False, arg_overrides=arg_ovr)
-                        pr("    @overload")
-                        pr(f"    def __call__(self{',' if params else ''} {params}) -> {ret}: ..." if params else f"    def __call__(self) -> {ret}: ...")
+                        blines.append("    @overload")
+                        blines.append(f"    def __call__(self{',' if params else ''} {params}) -> {ret}: ..." if params else f"    def __call__(self) -> {ret}: ...")
 
                     elif p > 0:
                         # Partial application → lower Protocol
                         tgt_k = k - p
                         tgt_tp = _proto_type_params(tgt_k, ST)
-                        ref = _ref_str(_cls_name(ST, tgt_k), tgt_tp, _needs_quotes(k, S, tgt_k, ST))
+                        tgt = proto_id(tgt_k, ST)
+                        # self-reference only if same block
+                        quoted = (tgt == bid)
+                        if not quoted:
+                            bdeps.add(tgt)
+                        ref = _ref_str(_cls_name(ST, tgt_k), tgt_tp, quoted)
                         params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=True)
-                        pr("    @overload")
-                        pr(f"    def __call__(self, {params}) -> {ref}: ...")
+                        blines.append("    @overload")
+                        blines.append(f"    def __call__(self, {params}) -> {ref}: ...")
 
                     else:
                         # p == 0
                         if not T:
-                            # Self-reference (untracked kwargs subsume the plain empty case)
+                            # Self-reference
                             ref = _ref_str(cls, type_params, True)
                             params = _render_params([], [], include_untracked=True, force_kw_tracked=True)
-                            pr("    @overload")
-                            pr(f"    def __call__(self, {params}) -> {ref}: ..." if params else f"    def __call__(self) -> {ref}: ...")
+                            blines.append("    @overload")
+                            blines.append(f"    def __call__(self, {params}) -> {ref}: ..." if params else f"    def __call__(self) -> {ref}: ...")
                         else:
-                            # Only tracked kwargs provided → same currying level, larger subset
+                            # Only tracked kwargs → same k, larger S
                             tgt_tp = _proto_type_params(k, ST)
-                            ref = _ref_str(_cls_name(ST, k), tgt_tp, _needs_quotes(k, S, k, ST))
+                            tgt = proto_id(k, ST)
+                            quoted = (tgt == bid)
+                            if not quoted:
+                                bdeps.add(tgt)
+                            ref = _ref_str(_cls_name(ST, k), tgt_tp, quoted)
                             params = _render_params([], tracked_provided, include_untracked=False, force_kw_tracked=True)
-                            pr("    @overload")
-                            pr(f"    def __call__(self, {params}) -> {ref}: ...")
+                            blines.append("    @overload")
+                            blines.append(f"    def __call__(self, {params}) -> {ref}: ...")
 
-            pr("")
+            blines.append("")
+            blocks[bid] = (blines, bdeps)
 
-    # Entry-point overloads
-    for p in range(n + m, -1, -1):
-        for T_tuple in powerset(tk_positions):
-            T = frozenset(T_tuple)
+    # ------------------------------------------------------------------
+    # Topological sort (Kahn's algorithm by indegree)
+    #
+    # Edges: dep → bid  (dep must be emitted before bid)
+    # Nodes with indegree 0 have no pending dependencies → emit first.
+    # This produces a bottom-up output order, ensuring every type is
+    # defined before it is referenced, with no forward-reference quotes
+    # needed except for genuine self-references.
+    # ------------------------------------------------------------------
 
-            pos = list(required[:p]) if p <= n else list(required) + list(opt_pos[:p - n])
-            tracked_provided = [tracked[i] for i in sorted(T)]
+    in_degree: dict[BlockId, int] = {bid: 0 for bid in blocks}
+    successors: dict[BlockId, list[BlockId]] = {bid: [] for bid in blocks}
 
-            if p >= n:
-                lc_req = frozenset(range(n))
-                lc_opt = frozenset(range(p - n))
-                ret, arg_ovr = _resolve_implications(frozenset(range(n)), T, lc_req, lc_opt, T)
-                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=False, arg_overrides=arg_ovr)
-                pr("@overload")
-                pr(f"def {fname}({params}) -> {ret}: ..." if params else f"def {fname}() -> {ret}: ...")
+    for bid, (_, deps) in blocks.items():
+        for dep in deps:
+            in_degree[bid] += 1
+            successors[dep].append(bid)
 
-            elif p > 0:
-                tgt_k = n - p
-                tgt_tp = _proto_type_params(tgt_k, T)
-                ref = _ref_str(_cls_name(T, tgt_k), tgt_tp, False)
-                params = _render_params(pos, tracked_provided, include_untracked=True, force_kw_tracked=True)
-                pr("@overload")
-                pr(f"def {fname}({params}) -> {ref}: ...")
+    queue: deque[BlockId] = deque(bid for bid in blocks if in_degree[bid] == 0)
+    topo_order: list[BlockId] = []
+    while queue:
+        bid = queue.popleft()
+        topo_order.append(bid)
+        for succ in successors[bid]:
+            in_degree[succ] -= 1
+            if in_degree[succ] == 0:
+                queue.append(succ)
 
-            else:
-                tgt_tp = _proto_type_params(n, T)
-                ref = _ref_str(_cls_name(T, n), tgt_tp, False)
-                if not T:
-                    params = _render_params([], [], include_untracked=True, force_kw_tracked=True)
-                    pr("@overload")
-                    pr(f"def {fname}({params}) -> {ref}: ..." if params else f"def {fname}() -> {ref}: ...")
-                else:
-                    params = _render_params([], tracked_provided, include_untracked=False, force_kw_tracked=True)
-                    pr("@overload")
-                    pr(f"def {fname}({params}) -> {ref}: ...")
+    if len(topo_order) != len(blocks):
+        raise RuntimeError("Cycle detected in Protocol dependency graph")
 
-    return "\n".join(lines)
+    # ------------------------------------------------------------------
+    # Emit in topological order
+    # ------------------------------------------------------------------
+
+    out: list[str] = [spec.preamble, "", "from typing import Protocol, overload", ""]
+    for bid in topo_order:
+        out.extend(blocks[bid][0])
+
+    return "\n".join(out)
 
 
 # ---------------------------------------------------------------------------
